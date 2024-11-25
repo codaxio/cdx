@@ -198,7 +198,7 @@ class CommandManager {
           return await this.setupConfig()
         if (data.config || process.env.CDX_CONFIG)
           await this.loadCLIConfig(data.config || process.env.CDX_CONFIG)
-        if (!this.config?.workspaces?.length) return await this.setupWorkspace()
+        if (!Object.keys(this.config?.workspaces || {})?.length) return await this.setupWorkspace()
         if (data.workspace) await this.loadWorkspace(data.workspace)
         if (this.config.commands) this.scan.push(...this.config.commands)
         this.commands = await this.loadCommands()
