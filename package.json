@@ -1,10 +1,10 @@
 {
   "name": "@codaxio/cli",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "module": "src/index.ts",
   "bin": {
-    "cdx": "./start.sh"
+    "cdx": "start.sh"
   },
   "description": "Best CLI ever, period.",
   "main": "dist/index.js",

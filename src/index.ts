@@ -146,8 +146,8 @@ class CommandManager {
 
   start() {
     const program = new Command()
-      .command(this.workspace.name)
-      .description(this.workspace.description || this.workspace.name)
+      .command(this.workspace?.name || "cdx")
+      .description(this.workspace?.description || this.workspace?.name || "Cozy Developer eXperience.")
       .option("-c, --config <path>", "Path to the configuration file")
       .option("-v, --verbose", "Verbose output")
       .version("0.1.0")
@@ -200,7 +200,6 @@ class CommandManager {
         if (this.config.commands) this.scan.push(...this.config.commands)
         this.commands = await this.loadCommands()
         this.start()
-
       })
 
 
