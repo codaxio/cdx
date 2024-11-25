@@ -19,6 +19,7 @@
   ],
   "scripts": {
     "start": "pnpm tsx --watch src/index.ts --cli",
+    "build": "tsup src/index.ts --dts --minify --format cjs,esm --out-dir dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
@@ -34,5 +35,9 @@
     "commander": "^12.1.0",
     "defu": "^6.1.4",
     "inquirer": "^12.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   }
 }

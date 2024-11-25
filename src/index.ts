@@ -8,6 +8,9 @@ import type { BaseCommand } from "./command"
 import path from "path"
 
 export {Command} from "commander"
+export {BaseCommand} from "./command"
+export * as utils from "./utils"
+
 const DEBUG = process.env.DEBUG === "true"
 
 export async function createCLI() {
