@@ -5,6 +5,7 @@ import inquirer from "inquirer"
 import { Command } from "commander"
 import fs from "fs"
 import type { BaseCommand } from "./command"
+import path from "path"
 
 export {Command} from "commander"
 const DEBUG = process.env.DEBUG === "true"
@@ -37,6 +38,7 @@ class CommandManager {
   scan: string[] = []
   commands: BaseCommand[] = []
   config: any
+  configPath: string = ""
   workspace: any
   program?: Command
   constructor(public argv: string[]) {}
@@ -77,14 +79,14 @@ class CommandManager {
   }
 
   async loadCLIConfig(configPath: string) {
-    configPath = this.guessExtension(configPath)
+    this.configPath = this.guessExtension(configPath)
     let exists = fs.existsSync(configPath)
     if (!exists) {
       console.error("Config file not found", configPath)
       process.exit(1)
     }
 
-    this.config = await this.loadFile(configPath)
+    this.config = await this.loadFile(this.configPath)
   }
 
   async loadWorkspace(workspace: string) {
@@ -196,6 +198,7 @@ class CommandManager {
           return await this.setupConfig()
         if (data.config || process.env.CDX_CONFIG)
           await this.loadCLIConfig(data.config || process.env.CDX_CONFIG)
+        if (!this.config?.workspaces?.length) return await this.setupWorkspace()
         if (data.workspace) await this.loadWorkspace(data.workspace)
         if (this.config.commands) this.scan.push(...this.config.commands)
         this.commands = await this.loadCommands()
@@ -208,6 +211,59 @@ class CommandManager {
     this.program.allowExcessArguments()
     this.program.enablePositionalOptions()
     this.program.parse(this.argv)
+
+  }
+
+  async setupWorkspace() {
+    console.log("You must create a workspace to continue")
+    const w = await inquirer.prompt([
+      {
+        type: "input",
+        name: "workspace",
+        message: "Enter a workspace name",
+        required: true,
+      },
+      {
+        type: "input",
+        name: "path",
+        message: "Enter the path to the workspace",
+        default: process.cwd(),
+        required: true,
+      },
+      {
+        type: "input",
+        name: "config",
+        message: "Enter the path to the workspace configuration file",
+        default: "cdx.config.ts",
+        required: true,
+      },
+    ])
+
+    this.config = {
+      ...this.config,
+      workspaces: {
+        ...this.config?.workspaces,
+        [w.workspace]: {
+          name: w.workspace,
+          path: w.path,
+          config: w.config,
+        }
+      }
+    }
+
+    if (/\.(json|ts|js|yaml|yml)$/.test(this.configPath.toLowerCase())) {
+      let jsonConfig = JSON.stringify(this.config, null, 2)
+      if (this.configPath.endsWith(".json")) {
+        fs.writeFileSync(this.configPath, jsonConfig)
+      }
+      if (this.configPath.endsWith(".yaml") || this.configPath.endsWith(".yml")) {
+        fs.writeFileSync(this.configPath, `${await run(`echo "${jsonConfig}" | yq -P`)}\n`)
+      }
+      if (this.configPath.endsWith(".ts") || this.configPath.endsWith(".js")) {
+        console.log(`Please add the following to your config file (${this.configPath}):`)
+        console.log(`${jsonConfig}`)
+      }
+    }
 
   }
 
@@ -235,7 +291,10 @@ class CommandManager {
           return
         }
         await run(
-          `echo "export CDX_CONFIG=$(realpath ${a.config})" >> ~/.zshrc;`
+          `touch ${a.config}`
+        )
+        await run(
+          `echo "\nexport CDX_CONFIG=$(realpath ${a.config})" >> ~/.zshrc;`
         )
         console.log("Added CDX_CONFIG to ~/.zshrc")
         console.log(
@@ -253,9 +312,11 @@ class CommandManager {
           console.log("CDX_CONFIG already set in ~/.bashrc")
           return
         }
-
         await run(
-          `echo "export CDX_CONFIG=$(realpath ${a.config})" >> ~/.bashrc;`
+          `touch ${a.config}`
+        )
+        await run(
+          `echo "\nexport CDX_CONFIG=$(realpath ${a.config})" >> ~/.bashrc;`
         )
         console.log("Added CDX_CONFIG to ~/.bashrc")
         console.log(
@@ -270,6 +331,7 @@ class CommandManager {
         console.log(`export CDX_CONFIG=$(realpath ${a.config})`)
         break
     }
+
   }
 }
 
