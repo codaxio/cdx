@@ -16,6 +16,7 @@ inputs:
   command:
     description: 'which command should be run?'
     required: true
+
 runs:
   using: 'node20'
-  main: 'CDX_CONFIG=${{ inputs.config || "" }} dist/index.js --workspace ${{ inputs.workspace || "" }} -- ${{ inputs.command }}'
+  main: 'dist/index.js --cli'
