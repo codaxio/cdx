@@ -1,0 +1,33 @@
+{
+  "name": "@codaxio/cli",
+  "type": "module",
+  "version": "0.2.0",
+  "module": "src/index.ts",
+  "bin": {
+    "cdx": "./start.sh"
+  },
+  "description": "Best CLI ever, period.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "pnpm tsx --watch src/index.ts --cli",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [],
+  "author": "Codaxio",
+  "license": "UNLICENSED",
+  "namespace": "@codaxio",
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "defu": "^6.1.4",
+    "inquirer": "^12.1.0"
+  }
+}
