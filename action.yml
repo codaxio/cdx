@@ -18,5 +18,10 @@ inputs:
     required: true
 
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: 'composite'
+  steps: 
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - name: 'Install dependencies'
+      run: pnpm --package=@codaxio/cdx dlx cdx
