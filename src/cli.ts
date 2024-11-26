@@ -13,7 +13,6 @@ export async function cli() {
   .action(async (options, command) => {
     dd("CDX CLI", options);
     let configFile = options.config || process.env.CDX_CONFIG || "cdx.config.ts";
-    dd(`Loading config from ${configFile}`);
     let config = await loadFile(guessExtension(configFile));
     dd(`Loading config from ${configFile}`, config);
     let commandsPath = options.load?.length ? options.load : (process.env.CDX_SCAN?.split(":") || ["./commands"])
@@ -67,7 +66,7 @@ export async function cli() {
     ) => {
       dd("Registering command", cmd)
       let Command = cmd.command
-      let instance = new Command(program)
+      let instance = new Command(program, config)
       await instance.register()
     }))
     program.parse(argv)

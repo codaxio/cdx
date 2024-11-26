@@ -7,7 +7,7 @@ export class BaseCommand {
     ['-h, --help', 'Show help'],
   ];
 
-  constructor(public program: Command) {}
+  constructor(public program: Command, public config: Record<string, any>) {}
 
   async register() {
     const command = this.program.command(this.name).description(this.description);
