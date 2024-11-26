@@ -294,7 +294,7 @@ var import_fs3 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.14",
+  version: "0.20.15",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
