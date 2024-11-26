@@ -1,7 +1,7 @@
 {
   "name": "@codaxio/cdx",
   "type": "module",
-  "version": "0.20.9",
+  "version": "0.20.10",
   "module": "src/index.ts",
   "bin": {
     "cdx": "start.sh"
