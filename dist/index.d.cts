@@ -4,10 +4,11 @@ import { Writable } from 'stream';
 
 declare class BaseCommand {
     program: Command;
+    config: Record<string, any>;
     name: string;
     description: string;
     options: string[][];
-    constructor(program: Command);
+    constructor(program: Command, config: Record<string, any>);
     register(): Promise<Command>;
     run(): void;
     log(...args: any[]): void;

@@ -47,8 +47,9 @@ module.exports = __toCommonJS(src_exports);
 // src/command.ts
 var import_commander = require("commander");
 var BaseCommand = class {
-  constructor(program) {
+  constructor(program, config) {
     this.program = program;
+    this.config = config;
   }
   name = "BaseCommand";
   description = "Command";
@@ -268,7 +269,7 @@ var import_fs2 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.5",
+  version: "0.20.8",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
@@ -315,7 +316,8 @@ async function cli() {
   const program = new import_commander2.Command().version(package_default.version).description("CDX CLI").option("-w, --cwd <path>", "Teleport to this directory").option("-c, --config <config>", "Config file").option("-l, --load <path...>", "Load commands from theses dirs or files").action(async (options, command) => {
     dd("CDX CLI", options);
     let configFile = options.config || process.env.CDX_CONFIG || "cdx.config.ts";
-    dd(`Loading config from ${configFile}`);
+    let config = await loadFile(guessExtension(configFile));
+    dd(`Loading config from ${configFile}`, config);
     let commandsPath = options.load?.length ? options.load : process.env.CDX_SCAN?.split(":") || ["./commands"];
     if (options.cwd) {
       process.chdir(options.cwd);
@@ -347,6 +349,10 @@ async function cli() {
         }
       })
     );
+    if (!commandsPath.length) {
+      command.help();
+      return;
+    }
     let commands = commandsPath.flat();
     dd(`Found commands `, commands);
     const program2 = new import_commander2.Command().command("cdx").description("Cozy Developer eXperience.").action(async (data, command2, c2, d) => program2.help());
@@ -354,7 +360,7 @@ async function cli() {
     let registration = await Promise.all(commands.map(async (cmd) => {
       dd("Registering command", cmd);
       let Command3 = cmd.command;
-      let instance = new Command3(program2);
+      let instance = new Command3(program2, config);
       await instance.register();
     }));
     program2.parse(argv);
