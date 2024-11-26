@@ -7,7 +7,7 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
       '@types/node':
         specifier: ^20.0.0
         version: 20.17.7
@@ -23,6 +23,7 @@ importers:
       inquirer:
         specifier: ^12.1.0
         version: 12.1.0(@types/node@20.17.7)
+    devDependencies:
       tsup:
         specifier: ^8.3.5
         version: 8.3.5(typescript@5.7.2)

@@ -26,6 +26,8 @@ class MemoryWritable extends Writable {
     }
   }
 
+const IS_DEBUG = process.env.DEBUG === "true";
+export const dd = (...args: any[]) => IS_DEBUG && console.log(...args);
 export function createMemoryStream(options: { live: boolean }) { 
   return new MemoryWritable(options);
 }

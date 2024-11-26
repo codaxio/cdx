@@ -1,26 +1,331 @@
-var qe=Object.create;var fe=Object.defineProperty;var Le=Object.getOwnPropertyDescriptor;var Ge=Object.getOwnPropertyNames;var Ue=Object.getPrototypeOf,Ye=Object.prototype.hasOwnProperty;var k=(s=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(s,{get:(e,t)=>(typeof require<"u"?require:e)[t]}):s)(function(s){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+s+'" is not supported')});var Ke=(s,e)=>()=>(s&&(e=s(s=0)),e);var $=(s,e)=>()=>(e||s((e={exports:{}}).exports,e),e.exports);var Je=(s,e,t,i)=>{if(e&&typeof e=="object"||typeof e=="function")for(let n of Ge(e))!Ye.call(s,n)&&n!==t&&fe(s,n,{get:()=>e[n],enumerable:!(i=Le(e,n))||i.enumerable});return s};var Xe=(s,e,t)=>(t=s!=null?qe(Ue(s)):{},Je(e||!s||!s.__esModule?fe(t,"default",{value:s,enumerable:!0}):t,s));var d=Ke(()=>{"use strict"});var V=$(L=>{"use strict";d();var R=class extends Error{constructor(e,t,i){super(i),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name,this.code=t,this.exitCode=e,this.nestedError=void 0}},q=class extends R{constructor(e){super(1,"commander.invalidArgument",e),Error.captureStackTrace(this,this.constructor),this.name=this.constructor.name}};L.CommanderError=R;L.InvalidArgumentError=q});var j=$(U=>{"use strict";d();var{InvalidArgumentError:ze}=V(),G=class{constructor(e,t){switch(this.description=t||"",this.variadic=!1,this.parseArg=void 0,this.defaultValue=void 0,this.defaultValueDescription=void 0,this.argChoices=void 0,e[0]){case"<":this.required=!0,this._name=e.slice(1,-1);break;case"[":this.required=!1,this._name=e.slice(1,-1);break;default:this.required=!0,this._name=e;break}this._name.length>3&&this._name.slice(-3)==="..."&&(this.variadic=!0,this._name=this._name.slice(0,-3))}name(){return this._name}_concatValue(e,t){return t===this.defaultValue||!Array.isArray(t)?[e]:t.concat(e)}default(e,t){return this.defaultValue=e,this.defaultValueDescription=t,this}argParser(e){return this.parseArg=e,this}choices(e){return this.argChoices=e.slice(),this.parseArg=(t,i)=>{if(!this.argChoices.includes(t))throw new ze(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(t,i):t},this}argRequired(){return this.required=!0,this}argOptional(){return this.required=!1,this}};function Qe(s){let e=s.name()+(s.variadic===!0?"...":"");return s.required?"<"+e+">":"["+e+"]"}U.Argument=G;U.humanReadableArgName=Qe});var K=$(pe=>{"use strict";d();var{humanReadableArgName:Ze}=j(),Y=class{constructor(){this.helpWidth=void 0,this.sortSubcommands=!1,this.sortOptions=!1,this.showGlobalOptions=!1}visibleCommands(e){let t=e.commands.filter(n=>!n._hidden),i=e._getHelpCommand();return i&&!i._hidden&&t.push(i),this.sortSubcommands&&t.sort((n,r)=>n.name().localeCompare(r.name())),t}compareOptions(e,t){let i=n=>n.short?n.short.replace(/^-/,""):n.long.replace(/^--/,"");return i(e).localeCompare(i(t))}visibleOptions(e){let t=e.options.filter(n=>!n.hidden),i=e._getHelpOption();if(i&&!i.hidden){let n=i.short&&e._findOption(i.short),r=i.long&&e._findOption(i.long);!n&&!r?t.push(i):i.long&&!r?t.push(e.createOption(i.long,i.description)):i.short&&!n&&t.push(e.createOption(i.short,i.description))}return this.sortOptions&&t.sort(this.compareOptions),t}visibleGlobalOptions(e){if(!this.showGlobalOptions)return[];let t=[];for(let i=e.parent;i;i=i.parent){let n=i.options.filter(r=>!r.hidden);t.push(...n)}return this.sortOptions&&t.sort(this.compareOptions),t}visibleArguments(e){return e._argsDescription&&e.registeredArguments.forEach(t=>{t.description=t.description||e._argsDescription[t.name()]||""}),e.registeredArguments.find(t=>t.description)?e.registeredArguments:[]}subcommandTerm(e){let t=e.registeredArguments.map(i=>Ze(i)).join(" ");return e._name+(e._aliases[0]?"|"+e._aliases[0]:"")+(e.options.length?" [options]":"")+(t?" "+t:"")}optionTerm(e){return e.flags}argumentTerm(e){return e.name()}longestSubcommandTermLength(e,t){return t.visibleCommands(e).reduce((i,n)=>Math.max(i,t.subcommandTerm(n).length),0)}longestOptionTermLength(e,t){return t.visibleOptions(e).reduce((i,n)=>Math.max(i,t.optionTerm(n).length),0)}longestGlobalOptionTermLength(e,t){return t.visibleGlobalOptions(e).reduce((i,n)=>Math.max(i,t.optionTerm(n).length),0)}longestArgumentTermLength(e,t){return t.visibleArguments(e).reduce((i,n)=>Math.max(i,t.argumentTerm(n).length),0)}commandUsage(e){let t=e._name;e._aliases[0]&&(t=t+"|"+e._aliases[0]);let i="";for(let n=e.parent;n;n=n.parent)i=n.name()+" "+i;return i+t+" "+e.usage()}commandDescription(e){return e.description()}subcommandDescription(e){return e.summary()||e.description()}optionDescription(e){let t=[];return e.argChoices&&t.push(`choices: ${e.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),e.defaultValue!==void 0&&(e.required||e.optional||e.isBoolean()&&typeof e.defaultValue=="boolean")&&t.push(`default: ${e.defaultValueDescription||JSON.stringify(e.defaultValue)}`),e.presetArg!==void 0&&e.optional&&t.push(`preset: ${JSON.stringify(e.presetArg)}`),e.envVar!==void 0&&t.push(`env: ${e.envVar}`),t.length>0?`${e.description} (${t.join(", ")})`:e.description}argumentDescription(e){let t=[];if(e.argChoices&&t.push(`choices: ${e.argChoices.map(i=>JSON.stringify(i)).join(", ")}`),e.defaultValue!==void 0&&t.push(`default: ${e.defaultValueDescription||JSON.stringify(e.defaultValue)}`),t.length>0){let i=`(${t.join(", ")})`;return e.description?`${e.description} ${i}`:i}return e.description}formatHelp(e,t){let i=t.padWidth(e,t),n=t.helpWidth||80,r=2,o=2;function u(g,x){if(x){let W=`${g.padEnd(i+o)}${x}`;return t.wrap(W,n-r,i+o)}return g}function a(g){return g.join(`
-`).replace(/^/gm," ".repeat(r))}let l=[`Usage: ${t.commandUsage(e)}`,""],c=t.commandDescription(e);c.length>0&&(l=l.concat([t.wrap(c,n,0),""]));let h=t.visibleArguments(e).map(g=>u(t.argumentTerm(g),t.argumentDescription(g)));h.length>0&&(l=l.concat(["Arguments:",a(h),""]));let _=t.visibleOptions(e).map(g=>u(t.optionTerm(g),t.optionDescription(g)));if(_.length>0&&(l=l.concat(["Options:",a(_),""])),this.showGlobalOptions){let g=t.visibleGlobalOptions(e).map(x=>u(t.optionTerm(x),t.optionDescription(x)));g.length>0&&(l=l.concat(["Global Options:",a(g),""]))}let v=t.visibleCommands(e).map(g=>u(t.subcommandTerm(g),t.subcommandDescription(g)));return v.length>0&&(l=l.concat(["Commands:",a(v),""])),l.join(`
-`)}padWidth(e,t){return Math.max(t.longestOptionTermLength(e,t),t.longestGlobalOptionTermLength(e,t),t.longestSubcommandTermLength(e,t),t.longestArgumentTermLength(e,t))}wrap(e,t,i,n=40){let r=" \\f\\t\\v\xA0\u1680\u2000-\u200A\u202F\u205F\u3000\uFEFF",o=new RegExp(`[\\n][${r}]+`);if(e.match(o))return e;let u=t-i;if(u<n)return e;let a=e.slice(0,i),l=e.slice(i).replace(`\r
-`,`
-`),c=" ".repeat(i),_="\\s\u200B",v=new RegExp(`
-|.{1,${u-1}}([${_}]|$)|[^${_}]+?([${_}]|$)`,"g"),g=l.match(v)||[];return a+g.map((x,W)=>x===`
-`?"":(W>0?c:"")+x.trimEnd()).join(`
-`)}};pe.Help=Y});var Q=$(z=>{"use strict";d();var{InvalidArgumentError:et}=V(),J=class{constructor(e,t){this.flags=e,this.description=t||"",this.required=e.includes("<"),this.optional=e.includes("["),this.variadic=/\w\.\.\.[>\]]$/.test(e),this.mandatory=!1;let i=it(e);this.short=i.shortFlag,this.long=i.longFlag,this.negate=!1,this.long&&(this.negate=this.long.startsWith("--no-")),this.defaultValue=void 0,this.defaultValueDescription=void 0,this.presetArg=void 0,this.envVar=void 0,this.parseArg=void 0,this.hidden=!1,this.argChoices=void 0,this.conflictsWith=[],this.implied=void 0}default(e,t){return this.defaultValue=e,this.defaultValueDescription=t,this}preset(e){return this.presetArg=e,this}conflicts(e){return this.conflictsWith=this.conflictsWith.concat(e),this}implies(e){let t=e;return typeof e=="string"&&(t={[e]:!0}),this.implied=Object.assign(this.implied||{},t),this}env(e){return this.envVar=e,this}argParser(e){return this.parseArg=e,this}makeOptionMandatory(e=!0){return this.mandatory=!!e,this}hideHelp(e=!0){return this.hidden=!!e,this}_concatValue(e,t){return t===this.defaultValue||!Array.isArray(t)?[e]:t.concat(e)}choices(e){return this.argChoices=e.slice(),this.parseArg=(t,i)=>{if(!this.argChoices.includes(t))throw new et(`Allowed choices are ${this.argChoices.join(", ")}.`);return this.variadic?this._concatValue(t,i):t},this}name(){return this.long?this.long.replace(/^--/,""):this.short.replace(/^-/,"")}attributeName(){return tt(this.name().replace(/^no-/,""))}is(e){return this.short===e||this.long===e}isBoolean(){return!this.required&&!this.optional&&!this.negate}},X=class{constructor(e){this.positiveOptions=new Map,this.negativeOptions=new Map,this.dualOptions=new Set,e.forEach(t=>{t.negate?this.negativeOptions.set(t.attributeName(),t):this.positiveOptions.set(t.attributeName(),t)}),this.negativeOptions.forEach((t,i)=>{this.positiveOptions.has(i)&&this.dualOptions.add(i)})}valueFromOption(e,t){let i=t.attributeName();if(!this.dualOptions.has(i))return!0;let n=this.negativeOptions.get(i).presetArg,r=n!==void 0?n:!1;return t.negate===(r===e)}};function tt(s){return s.split("-").reduce((e,t)=>e+t[0].toUpperCase()+t.slice(1))}function it(s){let e,t,i=s.split(/[ |,]+/);return i.length>1&&!/^[[<]/.test(i[1])&&(e=i.shift()),t=i.shift(),!e&&/^-[^-]$/.test(t)&&(e=t,t=void 0),{shortFlag:e,longFlag:t}}z.Option=J;z.DualOptions=X});var _e=$(ge=>{"use strict";d();function nt(s,e){if(Math.abs(s.length-e.length)>3)return Math.max(s.length,e.length);let t=[];for(let i=0;i<=s.length;i++)t[i]=[i];for(let i=0;i<=e.length;i++)t[0][i]=i;for(let i=1;i<=e.length;i++)for(let n=1;n<=s.length;n++){let r=1;s[n-1]===e[i-1]?r=0:r=1,t[n][i]=Math.min(t[n-1][i]+1,t[n][i-1]+1,t[n-1][i-1]+r),n>1&&i>1&&s[n-1]===e[i-2]&&s[n-2]===e[i-1]&&(t[n][i]=Math.min(t[n][i],t[n-2][i-2]+1))}return t[s.length][e.length]}function rt(s,e){if(!e||e.length===0)return"";e=Array.from(new Set(e));let t=s.startsWith("--");t&&(s=s.slice(2),e=e.map(o=>o.slice(2)));let i=[],n=3,r=.4;return e.forEach(o=>{if(o.length<=1)return;let u=nt(s,o),a=Math.max(s.length,o.length);(a-u)/a>r&&(u<n?(n=u,i=[o]):u===n&&i.push(o))}),i.sort((o,u)=>o.localeCompare(u)),t&&(i=i.map(o=>`--${o}`)),i.length>1?`
-(Did you mean one of ${i.join(", ")}?)`:i.length===1?`
-(Did you mean ${i[0]}?)`:""}ge.suggestSimilar=rt});var we=$(Ae=>{"use strict";d();var st=k("node:events").EventEmitter,Z=k("node:child_process"),y=k("node:path"),ee=k("node:fs"),p=k("node:process"),{Argument:ot,humanReadableArgName:at}=j(),{CommanderError:te}=V(),{Help:lt}=K(),{Option:be,DualOptions:ut}=Q(),{suggestSimilar:Oe}=_e(),ie=class s extends st{constructor(e){super(),this.commands=[],this.options=[],this.parent=null,this._allowUnknownOption=!1,this._allowExcessArguments=!0,this.registeredArguments=[],this._args=this.registeredArguments,this.args=[],this.rawArgs=[],this.processedArgs=[],this._scriptPath=null,this._name=e||"",this._optionValues={},this._optionValueSources={},this._storeOptionsAsProperties=!1,this._actionHandler=null,this._executableHandler=!1,this._executableFile=null,this._executableDir=null,this._defaultCommandName=null,this._exitCallback=null,this._aliases=[],this._combineFlagAndOptionalValue=!0,this._description="",this._summary="",this._argsDescription=void 0,this._enablePositionalOptions=!1,this._passThroughOptions=!1,this._lifeCycleHooks={},this._showHelpAfterError=!1,this._showSuggestionAfterError=!0,this._outputConfiguration={writeOut:t=>p.stdout.write(t),writeErr:t=>p.stderr.write(t),getOutHelpWidth:()=>p.stdout.isTTY?p.stdout.columns:void 0,getErrHelpWidth:()=>p.stderr.isTTY?p.stderr.columns:void 0,outputError:(t,i)=>i(t)},this._hidden=!1,this._helpOption=void 0,this._addImplicitHelpCommand=void 0,this._helpCommand=void 0,this._helpConfiguration={}}copyInheritedSettings(e){return this._outputConfiguration=e._outputConfiguration,this._helpOption=e._helpOption,this._helpCommand=e._helpCommand,this._helpConfiguration=e._helpConfiguration,this._exitCallback=e._exitCallback,this._storeOptionsAsProperties=e._storeOptionsAsProperties,this._combineFlagAndOptionalValue=e._combineFlagAndOptionalValue,this._allowExcessArguments=e._allowExcessArguments,this._enablePositionalOptions=e._enablePositionalOptions,this._showHelpAfterError=e._showHelpAfterError,this._showSuggestionAfterError=e._showSuggestionAfterError,this}_getCommandAndAncestors(){let e=[];for(let t=this;t;t=t.parent)e.push(t);return e}command(e,t,i){let n=t,r=i;typeof n=="object"&&n!==null&&(r=n,n=null),r=r||{};let[,o,u]=e.match(/([^ ]+) *(.*)/),a=this.createCommand(o);return n&&(a.description(n),a._executableHandler=!0),r.isDefault&&(this._defaultCommandName=a._name),a._hidden=!!(r.noHelp||r.hidden),a._executableFile=r.executableFile||null,u&&a.arguments(u),this._registerCommand(a),a.parent=this,a.copyInheritedSettings(this),n?this:a}createCommand(e){return new s(e)}createHelp(){return Object.assign(new lt,this.configureHelp())}configureHelp(e){return e===void 0?this._helpConfiguration:(this._helpConfiguration=e,this)}configureOutput(e){return e===void 0?this._outputConfiguration:(Object.assign(this._outputConfiguration,e),this)}showHelpAfterError(e=!0){return typeof e!="string"&&(e=!!e),this._showHelpAfterError=e,this}showSuggestionAfterError(e=!0){return this._showSuggestionAfterError=!!e,this}addCommand(e,t){if(!e._name)throw new Error(`Command passed to .addCommand() must have a name
-- specify the name in Command constructor or using .name()`);return t=t||{},t.isDefault&&(this._defaultCommandName=e._name),(t.noHelp||t.hidden)&&(e._hidden=!0),this._registerCommand(e),e.parent=this,e._checkForBrokenPassThrough(),this}createArgument(e,t){return new ot(e,t)}argument(e,t,i,n){let r=this.createArgument(e,t);return typeof i=="function"?r.default(n).argParser(i):r.default(i),this.addArgument(r),this}arguments(e){return e.trim().split(/ +/).forEach(t=>{this.argument(t)}),this}addArgument(e){let t=this.registeredArguments.slice(-1)[0];if(t&&t.variadic)throw new Error(`only the last argument can be variadic '${t.name()}'`);if(e.required&&e.defaultValue!==void 0&&e.parseArg===void 0)throw new Error(`a default value for a required argument is never used: '${e.name()}'`);return this.registeredArguments.push(e),this}helpCommand(e,t){if(typeof e=="boolean")return this._addImplicitHelpCommand=e,this;e=e??"help [command]";let[,i,n]=e.match(/([^ ]+) *(.*)/),r=t??"display help for command",o=this.createCommand(i);return o.helpOption(!1),n&&o.arguments(n),r&&o.description(r),this._addImplicitHelpCommand=!0,this._helpCommand=o,this}addHelpCommand(e,t){return typeof e!="object"?(this.helpCommand(e,t),this):(this._addImplicitHelpCommand=!0,this._helpCommand=e,this)}_getHelpCommand(){return this._addImplicitHelpCommand??(this.commands.length&&!this._actionHandler&&!this._findCommand("help"))?(this._helpCommand===void 0&&this.helpCommand(void 0,void 0),this._helpCommand):null}hook(e,t){let i=["preSubcommand","preAction","postAction"];if(!i.includes(e))throw new Error(`Unexpected value for event passed to hook : '${e}'.
-Expecting one of '${i.join("', '")}'`);return this._lifeCycleHooks[e]?this._lifeCycleHooks[e].push(t):this._lifeCycleHooks[e]=[t],this}exitOverride(e){return e?this._exitCallback=e:this._exitCallback=t=>{if(t.code!=="commander.executeSubCommandAsync")throw t},this}_exit(e,t,i){this._exitCallback&&this._exitCallback(new te(e,t,i)),p.exit(e)}action(e){let t=i=>{let n=this.registeredArguments.length,r=i.slice(0,n);return this._storeOptionsAsProperties?r[n]=this:r[n]=this.opts(),r.push(this),e.apply(this,r)};return this._actionHandler=t,this}createOption(e,t){return new be(e,t)}_callParseArg(e,t,i,n){try{return e.parseArg(t,i)}catch(r){if(r.code==="commander.invalidArgument"){let o=`${n} ${r.message}`;this.error(o,{exitCode:r.exitCode,code:r.code})}throw r}}_registerOption(e){let t=e.short&&this._findOption(e.short)||e.long&&this._findOption(e.long);if(t){let i=e.long&&this._findOption(e.long)?e.long:e.short;throw new Error(`Cannot add option '${e.flags}'${this._name&&` to command '${this._name}'`} due to conflicting flag '${i}'
--  already used by option '${t.flags}'`)}this.options.push(e)}_registerCommand(e){let t=n=>[n.name()].concat(n.aliases()),i=t(e).find(n=>this._findCommand(n));if(i){let n=t(this._findCommand(i)).join("|"),r=t(e).join("|");throw new Error(`cannot add command '${r}' as already have command '${n}'`)}this.commands.push(e)}addOption(e){this._registerOption(e);let t=e.name(),i=e.attributeName();if(e.negate){let r=e.long.replace(/^--no-/,"--");this._findOption(r)||this.setOptionValueWithSource(i,e.defaultValue===void 0?!0:e.defaultValue,"default")}else e.defaultValue!==void 0&&this.setOptionValueWithSource(i,e.defaultValue,"default");let n=(r,o,u)=>{r==null&&e.presetArg!==void 0&&(r=e.presetArg);let a=this.getOptionValue(i);r!==null&&e.parseArg?r=this._callParseArg(e,r,a,o):r!==null&&e.variadic&&(r=e._concatValue(r,a)),r==null&&(e.negate?r=!1:e.isBoolean()||e.optional?r=!0:r=""),this.setOptionValueWithSource(i,r,u)};return this.on("option:"+t,r=>{let o=`error: option '${e.flags}' argument '${r}' is invalid.`;n(r,o,"cli")}),e.envVar&&this.on("optionEnv:"+t,r=>{let o=`error: option '${e.flags}' value '${r}' from env '${e.envVar}' is invalid.`;n(r,o,"env")}),this}_optionEx(e,t,i,n,r){if(typeof t=="object"&&t instanceof be)throw new Error("To add an Option object use addOption() instead of option() or requiredOption()");let o=this.createOption(t,i);if(o.makeOptionMandatory(!!e.mandatory),typeof n=="function")o.default(r).argParser(n);else if(n instanceof RegExp){let u=n;n=(a,l)=>{let c=u.exec(a);return c?c[0]:l},o.default(r).argParser(n)}else o.default(n);return this.addOption(o)}option(e,t,i,n){return this._optionEx({},e,t,i,n)}requiredOption(e,t,i,n){return this._optionEx({mandatory:!0},e,t,i,n)}combineFlagAndOptionalValue(e=!0){return this._combineFlagAndOptionalValue=!!e,this}allowUnknownOption(e=!0){return this._allowUnknownOption=!!e,this}allowExcessArguments(e=!0){return this._allowExcessArguments=!!e,this}enablePositionalOptions(e=!0){return this._enablePositionalOptions=!!e,this}passThroughOptions(e=!0){return this._passThroughOptions=!!e,this._checkForBrokenPassThrough(),this}_checkForBrokenPassThrough(){if(this.parent&&this._passThroughOptions&&!this.parent._enablePositionalOptions)throw new Error(`passThroughOptions cannot be used for '${this._name}' without turning on enablePositionalOptions for parent command(s)`)}storeOptionsAsProperties(e=!0){if(this.options.length)throw new Error("call .storeOptionsAsProperties() before adding options");if(Object.keys(this._optionValues).length)throw new Error("call .storeOptionsAsProperties() before setting option values");return this._storeOptionsAsProperties=!!e,this}getOptionValue(e){return this._storeOptionsAsProperties?this[e]:this._optionValues[e]}setOptionValue(e,t){return this.setOptionValueWithSource(e,t,void 0)}setOptionValueWithSource(e,t,i){return this._storeOptionsAsProperties?this[e]=t:this._optionValues[e]=t,this._optionValueSources[e]=i,this}getOptionValueSource(e){return this._optionValueSources[e]}getOptionValueSourceWithGlobals(e){let t;return this._getCommandAndAncestors().forEach(i=>{i.getOptionValueSource(e)!==void 0&&(t=i.getOptionValueSource(e))}),t}_prepareUserArgs(e,t){if(e!==void 0&&!Array.isArray(e))throw new Error("first parameter to parse must be array or undefined");if(t=t||{},e===void 0&&t.from===void 0){p.versions?.electron&&(t.from="electron");let n=p.execArgv??[];(n.includes("-e")||n.includes("--eval")||n.includes("-p")||n.includes("--print"))&&(t.from="eval")}e===void 0&&(e=p.argv),this.rawArgs=e.slice();let i;switch(t.from){case void 0:case"node":this._scriptPath=e[1],i=e.slice(2);break;case"electron":p.defaultApp?(this._scriptPath=e[1],i=e.slice(2)):i=e.slice(1);break;case"user":i=e.slice(0);break;case"eval":i=e.slice(1);break;default:throw new Error(`unexpected parse option { from: '${t.from}' }`)}return!this._name&&this._scriptPath&&this.nameFromFilename(this._scriptPath),this._name=this._name||"program",i}parse(e,t){let i=this._prepareUserArgs(e,t);return this._parseCommand([],i),this}async parseAsync(e,t){let i=this._prepareUserArgs(e,t);return await this._parseCommand([],i),this}_executeSubCommand(e,t){t=t.slice();let i=!1,n=[".js",".ts",".tsx",".mjs",".cjs"];function r(c,h){let _=y.resolve(c,h);if(ee.existsSync(_))return _;if(n.includes(y.extname(h)))return;let v=n.find(g=>ee.existsSync(`${_}${g}`));if(v)return`${_}${v}`}this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let o=e._executableFile||`${this._name}-${e._name}`,u=this._executableDir||"";if(this._scriptPath){let c;try{c=ee.realpathSync(this._scriptPath)}catch{c=this._scriptPath}u=y.resolve(y.dirname(c),u)}if(u){let c=r(u,o);if(!c&&!e._executableFile&&this._scriptPath){let h=y.basename(this._scriptPath,y.extname(this._scriptPath));h!==this._name&&(c=r(u,`${h}-${e._name}`))}o=c||o}i=n.includes(y.extname(o));let a;p.platform!=="win32"?i?(t.unshift(o),t=Ce(p.execArgv).concat(t),a=Z.spawn(p.argv[0],t,{stdio:"inherit"})):a=Z.spawn(o,t,{stdio:"inherit"}):(t.unshift(o),t=Ce(p.execArgv).concat(t),a=Z.spawn(p.execPath,t,{stdio:"inherit"})),a.killed||["SIGUSR1","SIGUSR2","SIGTERM","SIGINT","SIGHUP"].forEach(h=>{p.on(h,()=>{a.killed===!1&&a.exitCode===null&&a.kill(h)})});let l=this._exitCallback;a.on("close",c=>{c=c??1,l?l(new te(c,"commander.executeSubCommandAsync","(close)")):p.exit(c)}),a.on("error",c=>{if(c.code==="ENOENT"){let h=u?`searched for local subcommand relative to directory '${u}'`:"no directory for search for local subcommand, use .executableDir() to supply a custom directory",_=`'${o}' does not exist
- - if '${e._name}' is not meant to be an executable command, remove description parameter from '.command()' and use '.description()' instead
- - if the default executable name is not suitable, use the executableFile option to supply a custom name or path
- - ${h}`;throw new Error(_)}else if(c.code==="EACCES")throw new Error(`'${o}' not executable`);if(!l)p.exit(1);else{let h=new te(1,"commander.executeSubCommandAsync","(error)");h.nestedError=c,l(h)}}),this.runningCommand=a}_dispatchSubcommand(e,t,i){let n=this._findCommand(e);n||this.help({error:!0});let r;return r=this._chainOrCallSubCommandHook(r,n,"preSubcommand"),r=this._chainOrCall(r,()=>{if(n._executableHandler)this._executeSubCommand(n,t.concat(i));else return n._parseCommand(t,i)}),r}_dispatchHelpCommand(e){e||this.help();let t=this._findCommand(e);return t&&!t._executableHandler&&t.help(),this._dispatchSubcommand(e,[],[this._getHelpOption()?.long??this._getHelpOption()?.short??"--help"])}_checkNumberOfArguments(){this.registeredArguments.forEach((e,t)=>{e.required&&this.args[t]==null&&this.missingArgument(e.name())}),!(this.registeredArguments.length>0&&this.registeredArguments[this.registeredArguments.length-1].variadic)&&this.args.length>this.registeredArguments.length&&this._excessArguments(this.args)}_processArguments(){let e=(i,n,r)=>{let o=n;if(n!==null&&i.parseArg){let u=`error: command-argument value '${n}' is invalid for argument '${i.name()}'.`;o=this._callParseArg(i,n,r,u)}return o};this._checkNumberOfArguments();let t=[];this.registeredArguments.forEach((i,n)=>{let r=i.defaultValue;i.variadic?n<this.args.length?(r=this.args.slice(n),i.parseArg&&(r=r.reduce((o,u)=>e(i,u,o),i.defaultValue))):r===void 0&&(r=[]):n<this.args.length&&(r=this.args[n],i.parseArg&&(r=e(i,r,i.defaultValue))),t[n]=r}),this.processedArgs=t}_chainOrCall(e,t){return e&&e.then&&typeof e.then=="function"?e.then(()=>t()):t()}_chainOrCallHooks(e,t){let i=e,n=[];return this._getCommandAndAncestors().reverse().filter(r=>r._lifeCycleHooks[t]!==void 0).forEach(r=>{r._lifeCycleHooks[t].forEach(o=>{n.push({hookedCommand:r,callback:o})})}),t==="postAction"&&n.reverse(),n.forEach(r=>{i=this._chainOrCall(i,()=>r.callback(r.hookedCommand,this))}),i}_chainOrCallSubCommandHook(e,t,i){let n=e;return this._lifeCycleHooks[i]!==void 0&&this._lifeCycleHooks[i].forEach(r=>{n=this._chainOrCall(n,()=>r(this,t))}),n}_parseCommand(e,t){let i=this.parseOptions(t);if(this._parseOptionsEnv(),this._parseOptionsImplied(),e=e.concat(i.operands),t=i.unknown,this.args=e.concat(t),e&&this._findCommand(e[0]))return this._dispatchSubcommand(e[0],e.slice(1),t);if(this._getHelpCommand()&&e[0]===this._getHelpCommand().name())return this._dispatchHelpCommand(e[1]);if(this._defaultCommandName)return this._outputHelpIfRequested(t),this._dispatchSubcommand(this._defaultCommandName,e,t);this.commands.length&&this.args.length===0&&!this._actionHandler&&!this._defaultCommandName&&this.help({error:!0}),this._outputHelpIfRequested(i.unknown),this._checkForMissingMandatoryOptions(),this._checkForConflictingOptions();let n=()=>{i.unknown.length>0&&this.unknownOption(i.unknown[0])},r=`command:${this.name()}`;if(this._actionHandler){n(),this._processArguments();let o;return o=this._chainOrCallHooks(o,"preAction"),o=this._chainOrCall(o,()=>this._actionHandler(this.processedArgs)),this.parent&&(o=this._chainOrCall(o,()=>{this.parent.emit(r,e,t)})),o=this._chainOrCallHooks(o,"postAction"),o}if(this.parent&&this.parent.listenerCount(r))n(),this._processArguments(),this.parent.emit(r,e,t);else if(e.length){if(this._findCommand("*"))return this._dispatchSubcommand("*",e,t);this.listenerCount("command:*")?this.emit("command:*",e,t):this.commands.length?this.unknownCommand():(n(),this._processArguments())}else this.commands.length?(n(),this.help({error:!0})):(n(),this._processArguments())}_findCommand(e){if(e)return this.commands.find(t=>t._name===e||t._aliases.includes(e))}_findOption(e){return this.options.find(t=>t.is(e))}_checkForMissingMandatoryOptions(){this._getCommandAndAncestors().forEach(e=>{e.options.forEach(t=>{t.mandatory&&e.getOptionValue(t.attributeName())===void 0&&e.missingMandatoryOptionValue(t)})})}_checkForConflictingLocalOptions(){let e=this.options.filter(i=>{let n=i.attributeName();return this.getOptionValue(n)===void 0?!1:this.getOptionValueSource(n)!=="default"});e.filter(i=>i.conflictsWith.length>0).forEach(i=>{let n=e.find(r=>i.conflictsWith.includes(r.attributeName()));n&&this._conflictingOption(i,n)})}_checkForConflictingOptions(){this._getCommandAndAncestors().forEach(e=>{e._checkForConflictingLocalOptions()})}parseOptions(e){let t=[],i=[],n=t,r=e.slice();function o(a){return a.length>1&&a[0]==="-"}let u=null;for(;r.length;){let a=r.shift();if(a==="--"){n===i&&n.push(a),n.push(...r);break}if(u&&!o(a)){this.emit(`option:${u.name()}`,a);continue}if(u=null,o(a)){let l=this._findOption(a);if(l){if(l.required){let c=r.shift();c===void 0&&this.optionMissingArgument(l),this.emit(`option:${l.name()}`,c)}else if(l.optional){let c=null;r.length>0&&!o(r[0])&&(c=r.shift()),this.emit(`option:${l.name()}`,c)}else this.emit(`option:${l.name()}`);u=l.variadic?l:null;continue}}if(a.length>2&&a[0]==="-"&&a[1]!=="-"){let l=this._findOption(`-${a[1]}`);if(l){l.required||l.optional&&this._combineFlagAndOptionalValue?this.emit(`option:${l.name()}`,a.slice(2)):(this.emit(`option:${l.name()}`),r.unshift(`-${a.slice(2)}`));continue}}if(/^--[^=]+=/.test(a)){let l=a.indexOf("="),c=this._findOption(a.slice(0,l));if(c&&(c.required||c.optional)){this.emit(`option:${c.name()}`,a.slice(l+1));continue}}if(o(a)&&(n=i),(this._enablePositionalOptions||this._passThroughOptions)&&t.length===0&&i.length===0){if(this._findCommand(a)){t.push(a),r.length>0&&i.push(...r);break}else if(this._getHelpCommand()&&a===this._getHelpCommand().name()){t.push(a),r.length>0&&t.push(...r);break}else if(this._defaultCommandName){i.push(a),r.length>0&&i.push(...r);break}}if(this._passThroughOptions){n.push(a),r.length>0&&n.push(...r);break}n.push(a)}return{operands:t,unknown:i}}opts(){if(this._storeOptionsAsProperties){let e={},t=this.options.length;for(let i=0;i<t;i++){let n=this.options[i].attributeName();e[n]=n===this._versionOptionName?this._version:this[n]}return e}return this._optionValues}optsWithGlobals(){return this._getCommandAndAncestors().reduce((e,t)=>Object.assign(e,t.opts()),{})}error(e,t){this._outputConfiguration.outputError(`${e}
-`,this._outputConfiguration.writeErr),typeof this._showHelpAfterError=="string"?this._outputConfiguration.writeErr(`${this._showHelpAfterError}
-`):this._showHelpAfterError&&(this._outputConfiguration.writeErr(`
-`),this.outputHelp({error:!0}));let i=t||{},n=i.exitCode||1,r=i.code||"commander.error";this._exit(n,r,e)}_parseOptionsEnv(){this.options.forEach(e=>{if(e.envVar&&e.envVar in p.env){let t=e.attributeName();(this.getOptionValue(t)===void 0||["default","config","env"].includes(this.getOptionValueSource(t)))&&(e.required||e.optional?this.emit(`optionEnv:${e.name()}`,p.env[e.envVar]):this.emit(`optionEnv:${e.name()}`))}})}_parseOptionsImplied(){let e=new ut(this.options),t=i=>this.getOptionValue(i)!==void 0&&!["default","implied"].includes(this.getOptionValueSource(i));this.options.filter(i=>i.implied!==void 0&&t(i.attributeName())&&e.valueFromOption(this.getOptionValue(i.attributeName()),i)).forEach(i=>{Object.keys(i.implied).filter(n=>!t(n)).forEach(n=>{this.setOptionValueWithSource(n,i.implied[n],"implied")})})}missingArgument(e){let t=`error: missing required argument '${e}'`;this.error(t,{code:"commander.missingArgument"})}optionMissingArgument(e){let t=`error: option '${e.flags}' argument missing`;this.error(t,{code:"commander.optionMissingArgument"})}missingMandatoryOptionValue(e){let t=`error: required option '${e.flags}' not specified`;this.error(t,{code:"commander.missingMandatoryOptionValue"})}_conflictingOption(e,t){let i=o=>{let u=o.attributeName(),a=this.getOptionValue(u),l=this.options.find(h=>h.negate&&u===h.attributeName()),c=this.options.find(h=>!h.negate&&u===h.attributeName());return l&&(l.presetArg===void 0&&a===!1||l.presetArg!==void 0&&a===l.presetArg)?l:c||o},n=o=>{let u=i(o),a=u.attributeName();return this.getOptionValueSource(a)==="env"?`environment variable '${u.envVar}'`:`option '${u.flags}'`},r=`error: ${n(e)} cannot be used with ${n(t)}`;this.error(r,{code:"commander.conflictingOption"})}unknownOption(e){if(this._allowUnknownOption)return;let t="";if(e.startsWith("--")&&this._showSuggestionAfterError){let n=[],r=this;do{let o=r.createHelp().visibleOptions(r).filter(u=>u.long).map(u=>u.long);n=n.concat(o),r=r.parent}while(r&&!r._enablePositionalOptions);t=Oe(e,n)}let i=`error: unknown option '${e}'${t}`;this.error(i,{code:"commander.unknownOption"})}_excessArguments(e){if(this._allowExcessArguments)return;let t=this.registeredArguments.length,i=t===1?"":"s",r=`error: too many arguments${this.parent?` for '${this.name()}'`:""}. Expected ${t} argument${i} but got ${e.length}.`;this.error(r,{code:"commander.excessArguments"})}unknownCommand(){let e=this.args[0],t="";if(this._showSuggestionAfterError){let n=[];this.createHelp().visibleCommands(this).forEach(r=>{n.push(r.name()),r.alias()&&n.push(r.alias())}),t=Oe(e,n)}let i=`error: unknown command '${e}'${t}`;this.error(i,{code:"commander.unknownCommand"})}version(e,t,i){if(e===void 0)return this._version;this._version=e,t=t||"-V, --version",i=i||"output the version number";let n=this.createOption(t,i);return this._versionOptionName=n.attributeName(),this._registerOption(n),this.on("option:"+n.name(),()=>{this._outputConfiguration.writeOut(`${e}
-`),this._exit(0,"commander.version",e)}),this}description(e,t){return e===void 0&&t===void 0?this._description:(this._description=e,t&&(this._argsDescription=t),this)}summary(e){return e===void 0?this._summary:(this._summary=e,this)}alias(e){if(e===void 0)return this._aliases[0];let t=this;if(this.commands.length!==0&&this.commands[this.commands.length-1]._executableHandler&&(t=this.commands[this.commands.length-1]),e===t._name)throw new Error("Command alias can't be the same as its name");let i=this.parent?._findCommand(e);if(i){let n=[i.name()].concat(i.aliases()).join("|");throw new Error(`cannot add alias '${e}' to command '${this.name()}' as already have command '${n}'`)}return t._aliases.push(e),this}aliases(e){return e===void 0?this._aliases:(e.forEach(t=>this.alias(t)),this)}usage(e){if(e===void 0){if(this._usage)return this._usage;let t=this.registeredArguments.map(i=>at(i));return[].concat(this.options.length||this._helpOption!==null?"[options]":[],this.commands.length?"[command]":[],this.registeredArguments.length?t:[]).join(" ")}return this._usage=e,this}name(e){return e===void 0?this._name:(this._name=e,this)}nameFromFilename(e){return this._name=y.basename(e,y.extname(e)),this}executableDir(e){return e===void 0?this._executableDir:(this._executableDir=e,this)}helpInformation(e){let t=this.createHelp();return t.helpWidth===void 0&&(t.helpWidth=e&&e.error?this._outputConfiguration.getErrHelpWidth():this._outputConfiguration.getOutHelpWidth()),t.formatHelp(this,t)}_getHelpContext(e){e=e||{};let t={error:!!e.error},i;return t.error?i=n=>this._outputConfiguration.writeErr(n):i=n=>this._outputConfiguration.writeOut(n),t.write=e.write||i,t.command=this,t}outputHelp(e){let t;typeof e=="function"&&(t=e,e=void 0);let i=this._getHelpContext(e);this._getCommandAndAncestors().reverse().forEach(r=>r.emit("beforeAllHelp",i)),this.emit("beforeHelp",i);let n=this.helpInformation(i);if(t&&(n=t(n),typeof n!="string"&&!Buffer.isBuffer(n)))throw new Error("outputHelp callback must return a string or a Buffer");i.write(n),this._getHelpOption()?.long&&this.emit(this._getHelpOption().long),this.emit("afterHelp",i),this._getCommandAndAncestors().forEach(r=>r.emit("afterAllHelp",i))}helpOption(e,t){return typeof e=="boolean"?(e?this._helpOption=this._helpOption??void 0:this._helpOption=null,this):(e=e??"-h, --help",t=t??"display help for command",this._helpOption=this.createOption(e,t),this)}_getHelpOption(){return this._helpOption===void 0&&this.helpOption(void 0,void 0),this._helpOption}addHelpOption(e){return this._helpOption=e,this}help(e){this.outputHelp(e);let t=p.exitCode||0;t===0&&e&&typeof e!="function"&&e.error&&(t=1),this._exit(t,"commander.help","(outputHelp)")}addHelpText(e,t){let i=["beforeAll","before","after","afterAll"];if(!i.includes(e))throw new Error(`Unexpected value for position to addHelpText.
-Expecting one of '${i.join("', '")}'`);let n=`${e}Help`;return this.on(n,r=>{let o;typeof t=="function"?o=t({error:r.error,command:r.command}):o=t,o&&r.write(`${o}
-`)}),this}_outputHelpIfRequested(e){let t=this._getHelpOption();t&&e.find(n=>t.is(n))&&(this.outputHelp(),this._exit(0,"commander.helpDisplayed","(outputHelp)"))}};function Ce(s){return s.map(e=>{if(!e.startsWith("--inspect"))return e;let t,i="127.0.0.1",n="9229",r;return(r=e.match(/^(--inspect(-brk)?)$/))!==null?t=r[1]:(r=e.match(/^(--inspect(-brk|-port)?)=([^:]+)$/))!==null?(t=r[1],/^\d+$/.test(r[3])?n=r[3]:i=r[3]):(r=e.match(/^(--inspect(-brk|-port)?)=([^:]+):(\d+)$/))!==null&&(t=r[1],i=r[3],n=r[4]),t&&n!=="0"?`${t}=${i}:${parseInt(n)+1}`:e})}Ae.Command=ie});var ve=$(C=>{"use strict";d();var{Argument:ye}=j(),{Command:ne}=we(),{CommanderError:ct,InvalidArgumentError:xe}=V(),{Help:ht}=K(),{Option:Ee}=Q();C.program=new ne;C.createCommand=s=>new ne(s);C.createOption=(s,e)=>new Ee(s,e);C.createArgument=(s,e)=>new ye(s,e);C.Command=ne;C.Option=Ee;C.Argument=ye;C.Help=ht;C.CommanderError=ct;C.InvalidArgumentError=xe;C.InvalidOptionArgumentError=xe});d();d();var $e=Xe(ve(),1),{program:Xt,createCommand:zt,createArgument:Qt,createOption:Zt,CommanderError:ei,InvalidArgumentError:ti,InvalidOptionArgumentError:ii,Command:re,Argument:ni,Option:ri,Help:si}=$e.default;import We from"fs";d();import{spawn as $t}from"child_process";d();function se(s){if(s===null||typeof s!="object")return!1;let e=Object.getPrototypeOf(s);return e!==null&&e!==Object.prototype&&Object.getPrototypeOf(e)!==null||Symbol.iterator in s?!1:Symbol.toStringTag in s?Object.prototype.toString.call(s)==="[object Module]":!0}function oe(s,e,t=".",i){if(!se(e))return oe(s,{},t,i);let n=Object.assign({},e);for(let r in s){if(r==="__proto__"||r==="constructor")continue;let o=s[r];o!=null&&(i&&i(n,r,o,t)||(Array.isArray(o)&&Array.isArray(n[r])?n[r]=[...o,...n[r]]:se(o)&&se(n[r])?n[r]=oe(o,n[r],(t?`${t}.`:"")+r.toString(),i):n[r]=o))}return n}function ae(s){return(...e)=>e.reduce((t,i)=>oe(t,i,"",s),{})}var li=ae(),ui=ae((s,e,t)=>{if(s[e]!==void 0&&typeof t=="function")return s[e]=t(s[e]),!0}),ci=ae((s,e,t)=>{if(Array.isArray(s[e])&&typeof t=="function")return s[e]=t(s[e]),!0});import I from"fs";d();d();var Se=(s=0)=>e=>`\x1B[${e+s}m`,Te=(s=0)=>e=>`\x1B[${38+s};5;${e}m`,ke=(s=0)=>(e,t,i)=>`\x1B[${38+s};2;${e};${t};${i}m`,m={modifier:{reset:[0,0],bold:[1,22],dim:[2,22],italic:[3,23],underline:[4,24],overline:[53,55],inverse:[7,27],hidden:[8,28],strikethrough:[9,29]},color:{black:[30,39],red:[31,39],green:[32,39],yellow:[33,39],blue:[34,39],magenta:[35,39],cyan:[36,39],white:[37,39],blackBright:[90,39],gray:[90,39],grey:[90,39],redBright:[91,39],greenBright:[92,39],yellowBright:[93,39],blueBright:[94,39],magentaBright:[95,39],cyanBright:[96,39],whiteBright:[97,39]},bgColor:{bgBlack:[40,49],bgRed:[41,49],bgGreen:[42,49],bgYellow:[43,49],bgBlue:[44,49],bgMagenta:[45,49],bgCyan:[46,49],bgWhite:[47,49],bgBlackBright:[100,49],bgGray:[100,49],bgGrey:[100,49],bgRedBright:[101,49],bgGreenBright:[102,49],bgYellowBright:[103,49],bgBlueBright:[104,49],bgMagentaBright:[105,49],bgCyanBright:[106,49],bgWhiteBright:[107,49]}},mi=Object.keys(m.modifier),dt=Object.keys(m.color),mt=Object.keys(m.bgColor),fi=[...dt,...mt];function ft(){let s=new Map;for(let[e,t]of Object.entries(m)){for(let[i,n]of Object.entries(t))m[i]={open:`\x1B[${n[0]}m`,close:`\x1B[${n[1]}m`},t[i]=m[i],s.set(n[0],n[1]);Object.defineProperty(m,e,{value:t,enumerable:!1})}return Object.defineProperty(m,"codes",{value:s,enumerable:!1}),m.color.close="\x1B[39m",m.bgColor.close="\x1B[49m",m.color.ansi=Se(),m.color.ansi256=Te(),m.color.ansi16m=ke(),m.bgColor.ansi=Se(10),m.bgColor.ansi256=Te(10),m.bgColor.ansi16m=ke(10),Object.defineProperties(m,{rgbToAnsi256:{value(e,t,i){return e===t&&t===i?e<8?16:e>248?231:Math.round((e-8)/247*24)+232:16+36*Math.round(e/255*5)+6*Math.round(t/255*5)+Math.round(i/255*5)},enumerable:!1},hexToRgb:{value(e){let t=/[a-f\d]{6}|[a-f\d]{3}/i.exec(e.toString(16));if(!t)return[0,0,0];let[i]=t;i.length===3&&(i=[...i].map(r=>r+r).join(""));let n=Number.parseInt(i,16);return[n>>16&255,n>>8&255,n&255]},enumerable:!1},hexToAnsi256:{value:e=>m.rgbToAnsi256(...m.hexToRgb(e)),enumerable:!1},ansi256ToAnsi:{value(e){if(e<8)return 30+e;if(e<16)return 90+(e-8);let t,i,n;if(e>=232)t=((e-232)*10+8)/255,i=t,n=t;else{e-=16;let u=e%36;t=Math.floor(e/36)/5,i=Math.floor(u/6)/5,n=u%6/5}let r=Math.max(t,i,n)*2;if(r===0)return 30;let o=30+(Math.round(n)<<2|Math.round(i)<<1|Math.round(t));return r===2&&(o+=60),o},enumerable:!1},rgbToAnsi:{value:(e,t,i)=>m.ansi256ToAnsi(m.rgbToAnsi256(e,t,i)),enumerable:!1},hexToAnsi:{value:e=>m.ansi256ToAnsi(m.hexToAnsi256(e)),enumerable:!1}}),m}var pt=ft(),w=pt;d();import le from"node:process";import gt from"node:os";import Ve from"node:tty";function A(s,e=globalThis.Deno?globalThis.Deno.args:le.argv){let t=s.startsWith("-")?"":s.length===1?"-":"--",i=e.indexOf(t+s),n=e.indexOf("--");return i!==-1&&(n===-1||i<n)}var{env:f}=le,P;A("no-color")||A("no-colors")||A("color=false")||A("color=never")?P=0:(A("color")||A("colors")||A("color=true")||A("color=always"))&&(P=1);function _t(){if("FORCE_COLOR"in f)return f.FORCE_COLOR==="true"?1:f.FORCE_COLOR==="false"?0:f.FORCE_COLOR.length===0?1:Math.min(Number.parseInt(f.FORCE_COLOR,10),3)}function bt(s){return s===0?!1:{level:s,hasBasic:!0,has256:s>=2,has16m:s>=3}}function Ot(s,{streamIsTTY:e,sniffFlags:t=!0}={}){let i=_t();i!==void 0&&(P=i);let n=t?P:i;if(n===0)return 0;if(t){if(A("color=16m")||A("color=full")||A("color=truecolor"))return 3;if(A("color=256"))return 2}if("TF_BUILD"in f&&"AGENT_NAME"in f)return 1;if(s&&!e&&n===void 0)return 0;let r=n||0;if(f.TERM==="dumb")return r;if(le.platform==="win32"){let o=gt.release().split(".");return Number(o[0])>=10&&Number(o[2])>=10586?Number(o[2])>=14931?3:2:1}if("CI"in f)return"GITHUB_ACTIONS"in f||"GITEA_ACTIONS"in f?3:["TRAVIS","CIRCLECI","APPVEYOR","GITLAB_CI","BUILDKITE","DRONE"].some(o=>o in f)||f.CI_NAME==="codeship"?1:r;if("TEAMCITY_VERSION"in f)return/^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(f.TEAMCITY_VERSION)?1:0;if(f.COLORTERM==="truecolor"||f.TERM==="xterm-kitty")return 3;if("TERM_PROGRAM"in f){let o=Number.parseInt((f.TERM_PROGRAM_VERSION||"").split(".")[0],10);switch(f.TERM_PROGRAM){case"iTerm.app":return o>=3?3:2;case"Apple_Terminal":return 2}}return/-256(color)?$/i.test(f.TERM)?2:/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(f.TERM)||"COLORTERM"in f?1:r}function He(s,e={}){let t=Ot(s,{streamIsTTY:s&&s.isTTY,...e});return bt(t)}var Ct={stdout:He({isTTY:Ve.isatty(1)}),stderr:He({isTTY:Ve.isatty(2)})},Ne=Ct;d();function Fe(s,e,t){let i=s.indexOf(e);if(i===-1)return s;let n=e.length,r=0,o="";do o+=s.slice(r,i)+e+t,r=i+n,i=s.indexOf(e,r);while(i!==-1);return o+=s.slice(r),o}function Ie(s,e,t,i){let n=0,r="";do{let o=s[i-1]==="\r";r+=s.slice(n,o?i-1:i)+e+(o?`\r
-`:`
-`)+t,n=i+1,i=s.indexOf(`
-`,n)}while(i!==-1);return r+=s.slice(n),r}var{stdout:Me,stderr:Re}=Ne,ue=Symbol("GENERATOR"),S=Symbol("STYLER"),H=Symbol("IS_EMPTY"),je=["ansi","ansi","ansi256","ansi16m"],T=Object.create(null),At=(s,e={})=>{if(e.level&&!(Number.isInteger(e.level)&&e.level>=0&&e.level<=3))throw new Error("The `level` option should be an integer from 0 to 3");let t=Me?Me.level:0;s.level=e.level===void 0?t:e.level};var wt=s=>{let e=(...t)=>t.join(" ");return At(e,s),Object.setPrototypeOf(e,N.prototype),e};function N(s){return wt(s)}Object.setPrototypeOf(N.prototype,Function.prototype);for(let[s,e]of Object.entries(w))T[s]={get(){let t=D(this,he(e.open,e.close,this[S]),this[H]);return Object.defineProperty(this,s,{value:t}),t}};T.visible={get(){let s=D(this,this[S],!0);return Object.defineProperty(this,"visible",{value:s}),s}};var ce=(s,e,t,...i)=>s==="rgb"?e==="ansi16m"?w[t].ansi16m(...i):e==="ansi256"?w[t].ansi256(w.rgbToAnsi256(...i)):w[t].ansi(w.rgbToAnsi(...i)):s==="hex"?ce("rgb",e,t,...w.hexToRgb(...i)):w[t][s](...i),yt=["rgb","hex","ansi256"];for(let s of yt){T[s]={get(){let{level:t}=this;return function(...i){let n=he(ce(s,je[t],"color",...i),w.color.close,this[S]);return D(this,n,this[H])}}};let e="bg"+s[0].toUpperCase()+s.slice(1);T[e]={get(){let{level:t}=this;return function(...i){let n=he(ce(s,je[t],"bgColor",...i),w.bgColor.close,this[S]);return D(this,n,this[H])}}}}var xt=Object.defineProperties(()=>{},{...T,level:{enumerable:!0,get(){return this[ue].level},set(s){this[ue].level=s}}}),he=(s,e,t)=>{let i,n;return t===void 0?(i=s,n=e):(i=t.openAll+s,n=e+t.closeAll),{open:s,close:e,openAll:i,closeAll:n,parent:t}},D=(s,e,t)=>{let i=(...n)=>Et(i,n.length===1?""+n[0]:n.join(" "));return Object.setPrototypeOf(i,xt),i[ue]=s,i[S]=e,i[H]=t,i},Et=(s,e)=>{if(s.level<=0||!e)return s[H]?"":e;let t=s[S];if(t===void 0)return e;let{openAll:i,closeAll:n}=t;if(e.includes("\x1B"))for(;t!==void 0;)e=Fe(e,t.close,t.open),t=t.parent;let r=e.indexOf(`
-`);return r!==-1&&(e=Ie(e,n,i,r)),i+e+n};Object.defineProperties(N.prototype,T);var vt=N(),$i=N({level:Re?Re.level:0});var F=vt;import{Writable as St}from"stream";var de=class extends St{_output;highWaterMark;live;constructor(e){super({...e,objectMode:!0}),this.live=e.live||!1,this.highWaterMark=e.highWaterMark||2,this._output=""}_write(e,t,i){this.live&&process.stdout.write(e),this._output+=e.toString()}_final(){return this._output}};function Tt(s){return new de(s)}async function kt(s,e={live:!1,cwd:process.cwd()}){return new Promise((t,i)=>{var n=Tt({live:e.live===!0});let r=$t(s,{shell:!0,cwd:e.cwd});r.stdout.pipe(n),r.on("close",function(o){o===0?t(n._final()):i(new Error(`Command failed with code ${o}`))}),r.stderr.on("data",function(o){throw console.log("Error running command",s,o.toString()),new Error(o.toString())})})}var B=async s=>{let e;switch(s.split(".").pop()){case"yml":case"yaml":let t=await kt(`yq ${s} -o json`);e=JSON.parse(String(t));break;case"json":e=JSON.parse(I.readFileSync(s).toString());break;case"ts":case"js":s.startsWith("/")||(s=`${process.cwd()}/${s}`),e=(await import(`${s}`)).default;break}return e},Pe=async s=>{let e=[],t=await B(s);if(t&&Object.keys(t).length)for(let[i,n]of Object.entries(t))e.push({name:i,command:n});else console.error("No commands found in",s);return e},me=async s=>{let e=[],t=I.readdirSync(s);if(t.includes("index.ts"))e.push(...await Pe(`${s}/index.ts`));else if(t.includes("index.js"))e.push(...await Pe(`${s}/index.js`));else for(let i of t){let n=`${s}/${i}`;I.lstatSync(n).isDirectory()?e.push(...await me(n)):e.push({name:String(i.split(".").shift()||`command-${e.length}`),command:await B(n)})}return e},M=(s,e=[".ts",".js",".json",".yaml",".yml"])=>{if(I.existsSync(s))return s;if(!/\.(json|ts|js|yaml|yml)$/.test(s.toLowerCase())){let i=e.find(n=>I.existsSync(s+n));s+=i||""}return s},De={blue:F.blue,green:F.green,red:F.red,yellow:F.yellow};var Be={name:"@codaxio/cdx",type:"module",version:"0.20.4",module:"src/index.ts",bin:{cdx:"start.sh"},repository:{type:"git",url:"git+https://github.com/codaxio/cdx.git"},description:"Best CLI ever, period.",main:"dist/index.js",types:"dist/index.d.ts",files:["dist","src"],scripts:{"build:publish":"pnpm i && pnpm build && pnpm version patch && pnpm publish",start:"pnpm tsx --watch src/index.ts",build:"tsup src/index.ts --dts --format cjs,esm --out-dir dist --clean",test:"vitest run","test:watch":"vitest",lint:"eslint .","lint:fix":"eslint . --fix"},keywords:[],author:"Codaxio",license:"UNLICENSED",namespace:"@codaxio",devDependencies:{"@types/node":"^20.0.0",chalk:"^5.3.0",commander:"^12.1.0",defu:"^6.1.4",inquirer:"^12.1.0",tsup:"^8.3.5",typescript:"^5.7.2"}};var Ht=process.env.DEBUG==="true",E=(...s)=>Ht&&console.log(...s);async function Nt(){new re().version(Be.version).description("CDX CLI").option("-w, --cwd <path>","Teleport to this directory").option("-c, --config <config>","Config file").option("-l, --load <path...>","Load commands from theses dirs or files").action(async(e,t)=>{E("CDX CLI",e);let i=e.config||process.env.CDX_CONFIG||"cdx.config.ts";E(`Loading config from ${i}`);let n=e.load?.length?e.load:process.env.CDX_SCAN?.split(":")||["./commands"];e.cwd&&process.chdir(e.cwd),n=[...new Set(n)],n=await Promise.all(await n.map(l=>l.startsWith("/")?l:`${process.cwd()}/${l}`).filter(l=>{let c=We.existsSync(M(l));return c||console.error(De.red(`Cannot load commands from ${l}. File or directory does not exist.`)),c}).map(async l=>{if(E(`Loading commands from ${M(l)}`),We.lstatSync(M(l)).isDirectory()){let h=await me(l);return E(`Found ${h.length} commands in ${l}`,h),h}else{let h=M(l);E(`Guessing ${h}`);let _=await B(h);return E(`Found ${_.length} command in ${l}`,_),{command:_,name:String(l.split(".").shift()?.split("/").pop())}}}));let r=n.flat();E("Found commands ",r);let o=new re().command("cdx").description("Cozy Developer eXperience.").action(async(l,c,h,_)=>o.help()),u=[process.argv[0],process.argv[1],...t.args],a=await Promise.all(r.map(async l=>{E("Registering command",l);let c=l.command;await new c(o).register()}));o.parse(u)}).parse(process.argv)}Nt();
+// src/command.ts
+import "commander";
+var BaseCommand = class {
+  constructor(program) {
+    this.program = program;
+  }
+  name = "BaseCommand";
+  description = "Command";
+  options = [
+    ["-h, --help", "Show help"]
+  ];
+  async register() {
+    const command = this.program.command(this.name).description(this.description);
+    this.options.forEach((option) => command.option(option[0], option[1]));
+    command.action(this.run.bind(this));
+    return command;
+  }
+  run() {
+    throw new Error("Method run not implemented.");
+  }
+  log(...args) {
+    console.log(`${this.name}:`, ...args);
+  }
+};
+
+// src/utils.ts
+import { spawn } from "child_process";
+
+// node_modules/.pnpm/defu@6.1.4/node_modules/defu/dist/defu.mjs
+function isPlainObject(value) {
+  if (value === null || typeof value !== "object") {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== null && prototype !== Object.prototype && Object.getPrototypeOf(prototype) !== null) {
+    return false;
+  }
+  if (Symbol.iterator in value) {
+    return false;
+  }
+  if (Symbol.toStringTag in value) {
+    return Object.prototype.toString.call(value) === "[object Module]";
+  }
+  return true;
+}
+function _defu(baseObject, defaults, namespace = ".", merger) {
+  if (!isPlainObject(defaults)) {
+    return _defu(baseObject, {}, namespace, merger);
+  }
+  const object = Object.assign({}, defaults);
+  for (const key in baseObject) {
+    if (key === "__proto__" || key === "constructor") {
+      continue;
+    }
+    const value = baseObject[key];
+    if (value === null || value === void 0) {
+      continue;
+    }
+    if (merger && merger(object, key, value, namespace)) {
+      continue;
+    }
+    if (Array.isArray(value) && Array.isArray(object[key])) {
+      object[key] = [...value, ...object[key]];
+    } else if (isPlainObject(value) && isPlainObject(object[key])) {
+      object[key] = _defu(
+        value,
+        object[key],
+        (namespace ? `${namespace}.` : "") + key.toString(),
+        merger
+      );
+    } else {
+      object[key] = value;
+    }
+  }
+  return object;
+}
+function createDefu(merger) {
+  return (...arguments_) => (
+    // eslint-disable-next-line unicorn/no-array-reduce
+    arguments_.reduce((p, c2) => _defu(p, c2, "", merger), {})
+  );
+}
+var defu = createDefu();
+var defuFn = createDefu((object, key, currentValue) => {
+  if (object[key] !== void 0 && typeof currentValue === "function") {
+    object[key] = currentValue(object[key]);
+    return true;
+  }
+});
+var defuArrayFn = createDefu((object, key, currentValue) => {
+  if (Array.isArray(object[key]) && typeof currentValue === "function") {
+    object[key] = currentValue(object[key]);
+    return true;
+  }
+});
+
+// src/utils.ts
+import fs from "fs";
+import chalk from "chalk";
+import { Writable } from "stream";
+var MemoryWritable = class extends Writable {
+  _output;
+  highWaterMark;
+  live;
+  constructor(options) {
+    super({ ...options, objectMode: true });
+    this.live = options.live || false;
+    this.highWaterMark = options.highWaterMark || 2;
+    this._output = "";
+  }
+  _write(chunk, encoding, callback) {
+    this.live && process.stdout.write(chunk);
+    this._output += chunk.toString();
+  }
+  _final() {
+    return this._output;
+  }
+};
+var IS_DEBUG = process.env.DEBUG === "true";
+var dd = (...args) => IS_DEBUG && console.log(...args);
+function createMemoryStream(options) {
+  return new MemoryWritable(options);
+}
+async function run(command, options = {
+  live: false,
+  cwd: process.cwd()
+}) {
+  return new Promise((resolve, reject) => {
+    var outputStream = createMemoryStream({ live: options.live === true });
+    const child = spawn(command, { shell: true, cwd: options.cwd });
+    child.stdout.pipe(outputStream);
+    child.on(
+      "close",
+      function(code) {
+        if (code === 0) {
+          resolve(outputStream._final());
+        } else {
+          reject(new Error(`Command failed with code ${code}`));
+        }
+      }
+    );
+    child.stderr.on("data", function(data) {
+      console.log("Error running command", command, data.toString());
+      throw new Error(data.toString());
+    });
+  });
+}
+var padBetween = function(left, right, padding = 30) {
+  return left.padEnd(padding, " ") + right.trim();
+};
+var loadFile = async (path) => {
+  let content;
+  switch (path.split(".").pop()) {
+    case "yml":
+    case "yaml":
+      let yaml = await run(`yq ${path} -o json`);
+      content = JSON.parse(String(yaml));
+      break;
+    case "json":
+      let json = JSON.parse(fs.readFileSync(path).toString());
+      content = json;
+      break;
+    case "ts":
+    case "js":
+      if (!path.startsWith("/")) path = `${process.cwd()}/${path}`;
+      const _module = await import(`${path}`);
+      content = _module.default;
+      break;
+  }
+  return content;
+};
+var loadBarrelFile = async (path) => {
+  let commands = [];
+  let content = await loadFile(path);
+  if (content && Object.keys(content).length) {
+    for (let [name, command] of Object.entries(content)) {
+      commands.push({ name, command });
+    }
+  } else {
+    console.error("No commands found in", path);
+  }
+  return commands;
+};
+var loadFromDir = async (dir) => {
+  let commands = [];
+  let files = fs.readdirSync(dir);
+  if (files.includes("index.ts")) commands.push(...await loadBarrelFile(`${dir}/index.ts`));
+  else if (files.includes("index.js")) commands.push(...await loadBarrelFile(`${dir}/index.js`));
+  else {
+    for (let file of files) {
+      let path = `${dir}/${file}`;
+      let isDir = fs.lstatSync(path).isDirectory();
+      if (isDir) commands.push(...await loadFromDir(path));
+      else commands.push({ name: String(
+        file.split(".").shift() || `command-${commands.length}`
+      ), command: await loadFile(path) });
+    }
+  }
+  return commands;
+};
+var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml", ".yml"]) => {
+  if (fs.existsSync(path)) return path;
+  let hasExtension = /\.(json|ts|js|yaml|yml)$/.test(path.toLowerCase());
+  if (!hasExtension) {
+    let extension = allowedExtensions.find((ext) => fs.existsSync(path + ext));
+    path += extension || "";
+  }
+  return path;
+};
+var c = {
+  blue: chalk.blue,
+  green: chalk.green,
+  red: chalk.red,
+  yellow: chalk.yellow
+};
+
+// src/cli.ts
+import { Command as Command2 } from "commander";
+import fs2 from "fs";
+
+// package.json
+var package_default = {
+  name: "@codaxio/cdx",
+  type: "module",
+  version: "0.20.5",
+  module: "src/index.ts",
+  bin: {
+    cdx: "start.sh"
+  },
+  repository: {
+    type: "git",
+    url: "git+https://github.com/codaxio/cdx.git"
+  },
+  description: "Best CLI ever, period.",
+  main: "dist/index.js",
+  types: "dist/index.d.ts",
+  files: [
+    "dist",
+    "src"
+  ],
+  scripts: {
+    "build:publish": "pnpm i && pnpm build && pnpm version patch && pnpm publish",
+    start: "pnpm tsx --watch src/index.ts",
+    build: "tsup src/index.ts --dts --format cjs,esm --out-dir dist --clean",
+    test: "vitest run",
+    "test:watch": "vitest",
+    lint: "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  keywords: [],
+  author: "Codaxio",
+  license: "UNLICENSED",
+  namespace: "@codaxio",
+  dependencies: {
+    "@types/node": "^20.0.0",
+    chalk: "^5.3.0",
+    commander: "^12.1.0",
+    defu: "^6.1.4",
+    inquirer: "^12.1.0"
+  },
+  devDependencies: {
+    tsup: "^8.3.5",
+    typescript: "^5.7.2"
+  }
+};
+
+// src/cli.ts
+async function cli() {
+  const program = new Command2().version(package_default.version).description("CDX CLI").option("-w, --cwd <path>", "Teleport to this directory").option("-c, --config <config>", "Config file").option("-l, --load <path...>", "Load commands from theses dirs or files").action(async (options, command) => {
+    dd("CDX CLI", options);
+    let configFile = options.config || process.env.CDX_CONFIG || "cdx.config.ts";
+    dd(`Loading config from ${configFile}`);
+    let commandsPath = options.load?.length ? options.load : process.env.CDX_SCAN?.split(":") || ["./commands"];
+    if (options.cwd) {
+      process.chdir(options.cwd);
+    }
+    commandsPath = [...new Set(commandsPath)];
+    commandsPath = await Promise.all(
+      await commandsPath.map((path) => {
+        if (path.startsWith("/")) return path;
+        return `${process.cwd()}/${path}`;
+      }).filter((commandPath) => {
+        let exists = fs2.existsSync(guessExtension(commandPath));
+        if (!exists) {
+          console.error(c.red(`Cannot load commands from ${commandPath}. File or directory does not exist.`));
+        }
+        return exists;
+      }).map(async (commandPath) => {
+        dd(`Loading commands from ${guessExtension(commandPath)}`);
+        const isDir = fs2.lstatSync(guessExtension(commandPath)).isDirectory();
+        if (isDir) {
+          let commands2 = await loadFromDir(commandPath);
+          dd(`Found ${commands2.length} commands in ${commandPath}`, commands2);
+          return commands2;
+        } else {
+          let guessedPath = guessExtension(commandPath);
+          dd(`Guessing ${guessedPath}`);
+          let command2 = await loadFile(guessedPath);
+          dd(`Found ${command2.length} command in ${commandPath}`, command2);
+          return { command: command2, name: String(commandPath.split(".").shift()?.split("/").pop()) };
+        }
+      })
+    );
+    let commands = commandsPath.flat();
+    dd(`Found commands `, commands);
+    const program2 = new Command2().command("cdx").description("Cozy Developer eXperience.").action(async (data, command2, c2, d) => program2.help());
+    const argv = [process.argv[0], process.argv[1], ...command.args];
+    let registration = await Promise.all(commands.map(async (cmd) => {
+      dd("Registering command", cmd);
+      let Command3 = cmd.command;
+      let instance = new Command3(program2);
+      await instance.register();
+    }));
+    program2.parse(argv);
+  });
+  program.parse(process.argv);
+}
+export {
+  BaseCommand,
+  c,
+  cli,
+  createMemoryStream,
+  dd,
+  guessExtension,
+  loadBarrelFile,
+  loadFile,
+  loadFromDir,
+  padBetween,
+  run
+};
+//# sourceMappingURL=index.js.map

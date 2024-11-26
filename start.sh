@@ -132,4 +132,4 @@ then
 fi
 
 THIS_SCRIPT_DIR=$(dirname "$(realpath "$0")")
-pnpx tsx "$THIS_SCRIPT_DIR/src/index.ts" $@
+pnpx tsx "$THIS_SCRIPT_DIR/src/start.ts" $@
