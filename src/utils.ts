@@ -54,7 +54,7 @@ child.on('close', function(code) {
 );
 child.stderr.on('data', function(data) { 
   console.log("Error running command", command, data.toString());
-  throw new Error(data.toString());
+  outputStream.write(c.red(data.toString()));
  });
 });
 }
