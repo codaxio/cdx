@@ -18,7 +18,7 @@
     "src"
   ],
   "scripts": {
-    "publish": "pnpm i && pnpm build && pnpm version patch && pnpm publish",
+    "build:publish": "pnpm i && pnpm build && pnpm version patch && pnpm publish",
     "start": "pnpm tsx --watch src/index.ts",
     "build": "tsup src/index.ts --dts --format cjs,esm --out-dir dist --clean",
     "test": "vitest run",
