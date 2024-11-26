@@ -14,6 +14,8 @@ export async function cli() {
     dd("CDX CLI", options);
     let configFile = options.config || process.env.CDX_CONFIG || "cdx.config.ts";
     dd(`Loading config from ${configFile}`);
+    let config = await loadFile(guessExtension(configFile));
+    dd(`Loading config from ${configFile}`, config);
     let commandsPath = options.load?.length ? options.load : (process.env.CDX_SCAN?.split(":") || ["./commands"])
     if (options.cwd) {
       process.chdir(options.cwd);
@@ -46,6 +48,11 @@ export async function cli() {
       }
     })
     )
+
+    if (!commandsPath.length) {
+      command.help();
+      return
+    }
     let commands  = commandsPath.flat()
     dd(`Found commands `, commands);
 
