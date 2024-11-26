@@ -1,0 +1,27 @@
+name: 'cdx'
+description: 'Dymanic CLI'
+author: Codaxio
+inputs:
+  token:
+    description: 'GitHub token for creating and grooming release PRs, defaults to using secrets.GITHUB_TOKEN'
+    required: false
+    default: ${{ github.token }}
+  config:
+    description: 'where can the config file be found in the project?'
+    required: true
+    default: '$HOME/.cdx.yaml'
+  workspace:
+    description: 'which workspace should be used?'
+    required: true
+  command:
+    description: 'which command should be run?'
+    required: true
+
+runs:
+  using: 'composite'
+  steps: 
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - name: 'Install dependencies'
+      run: pnpm --package=@codaxio/cdx dlx cdx
