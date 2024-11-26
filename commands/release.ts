@@ -140,24 +140,34 @@ export default class ReleaseCommand extends BaseCommand {
   }
 
   async checkBumps({ commits, commandConfig }: { commits: Commit[]; commandConfig: Record<string, any> }) {
-    const scanDirectories = commandConfig.scan;
+    let scanDirectories = commandConfig.scan;
     if (!scanDirectories) {
       this.log('No scan directory configured, you need to add paths to `release.scan` in your config file');
       return [];
     }
-    const files = commits
+    let hasRootPackageJson = false;
+    if (scanDirectories == '.' || scanDirectories.find((dir: string) => dir === '.')) {
+      hasRootPackageJson = true;
+    }
+    let files = commits
       .flatMap((commit) => commit.files)
       .filter((file) => scanDirectories.some((dir: string) => file.startsWith(dir)));
     this.log(`${files.length} files changed...`);
 
-    const packages = files
+    let packages = files
       .map((file) => [file.split('/')[0], file.split('/')[1]])
       .map((pkg) => pkg.join('/'))
       .filter((value, index, self) => self.indexOf(value) === index);
+    if (hasRootPackageJson) {
+      let rootFiles = commits.flatMap((commit) => commit.files)
+      .filter((file) => !files.includes(file));
+      console.log({rootFiles});
+      packages.push('.');
+    }
 
     this.log(`${packages.length} packages has changed...\n`);
     const bumps: Bump[] = packages.map((pkg: string) => {
-      const packageCommits = commits.filter((commit) => commit.files.some((file) => file.startsWith(pkg)));
+      const packageCommits = commits.filter((commit) => commit.files.some((file) => file.startsWith(pkg == '.' ? '' : pkg)));
       const isMajor = packageCommits.some((commit) => commit.isBreakingChange);
       const isMinor = packageCommits.some((commit) => commit.type === 'feat');
       const isPatch = packageCommits.some((commit) => commit.type === 'fix');

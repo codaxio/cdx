@@ -1,5 +1,5 @@
 export default {
   release: {
-    scan: ['src'],
+    scan: ['.'],
   },
 };
