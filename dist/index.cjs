@@ -46,34 +46,6 @@ module.exports = __toCommonJS(src_exports);
 
 // src/command.ts
 var import_commander = require("commander");
-var BaseCommand = class {
-  constructor(program, config) {
-    this.program = program;
-    this.config = config;
-  }
-  name = "BaseCommand";
-  description = "Command";
-  options = [
-    ["-h, --help", "Show help"]
-  ];
-  async register() {
-    const command = this.program.command(this.name).description(this.description);
-    this.options.forEach((option) => command.option(option[0], option[1]));
-    command.action(async (options, command2) => {
-      return await this.run(options, command2);
-    });
-    return command;
-  }
-  async run(options, command) {
-    throw new Error("Method run not implemented.");
-  }
-  log(...args) {
-    console.log(`${this.name}:`, ...args);
-  }
-};
-
-// src/utils.ts
-var import_child_process = require("child_process");
 
 // node_modules/.pnpm/defu@6.1.4/node_modules/defu/dist/defu.mjs
 function isPlainObject(value) {
@@ -143,8 +115,57 @@ var defuArrayFn = createDefu((object, key, currentValue) => {
   }
 });
 
-// src/utils.ts
+// src/command.ts
 var import_fs = __toESM(require("fs"), 1);
+var BaseCommand = class {
+  constructor(program, config) {
+    this.program = program;
+    this.config = config;
+  }
+  name = "BaseCommand";
+  description = "Command";
+  options = [
+    ["-h, --help", "Show help"]
+  ];
+  async register() {
+    const command = this.program.command(this.name).description(this.description);
+    this.options.forEach((option) => command.option(option[0], option[1]));
+    command.action(async (options, command2) => {
+      return await this.run(options, command2);
+    });
+    return command;
+  }
+  async run(options, command) {
+    throw new Error("Method run not implemented.");
+  }
+  readJson(path) {
+    return JSON.parse(import_fs.default.readFileSync(path, "utf-8"));
+  }
+  writeJson(path, data) {
+    import_fs.default.writeFileSync(path, JSON.stringify(data, null, 2));
+  }
+  getConfig(key) {
+    return key.split(".").reduce((acc, k) => acc[k], this.config || {});
+  }
+  mergeConfig(config, key) {
+    const final = defu(this.getConfig(key), config);
+    return key.split(".").reduce((acc, k, i, arr) => {
+      if (i === arr.length - 1) {
+        acc[k] = final;
+        return acc;
+      }
+      acc[k] = acc[k] || {};
+      return acc[k];
+    }, this.config || {});
+  }
+  log(...args) {
+    console.log(`${this.name}:`, ...args);
+  }
+};
+
+// src/utils.ts
+var import_child_process = require("child_process");
+var import_fs2 = __toESM(require("fs"), 1);
 var import_chalk = __toESM(require("chalk"), 1);
 var import_stream = require("stream");
 var MemoryWritable = class extends import_stream.Writable {
@@ -206,7 +227,7 @@ var loadFile = async (path) => {
       content = JSON.parse(String(yaml));
       break;
     case "json":
-      let json = JSON.parse(import_fs.default.readFileSync(path).toString());
+      let json = JSON.parse(import_fs2.default.readFileSync(path).toString());
       content = json;
       break;
     case "ts":
@@ -232,13 +253,13 @@ var loadBarrelFile = async (path) => {
 };
 var loadFromDir = async (dir) => {
   let commands = [];
-  let files = import_fs.default.readdirSync(dir);
+  let files = import_fs2.default.readdirSync(dir);
   if (files.includes("index.ts")) commands.push(...await loadBarrelFile(`${dir}/index.ts`));
   else if (files.includes("index.js")) commands.push(...await loadBarrelFile(`${dir}/index.js`));
   else {
     for (let file of files) {
       let path = `${dir}/${file}`;
-      let isDir = import_fs.default.lstatSync(path).isDirectory();
+      let isDir = import_fs2.default.lstatSync(path).isDirectory();
       if (isDir) commands.push(...await loadFromDir(path));
       else commands.push({ name: String(
         file.split(".").shift() || `command-${commands.length}`
@@ -248,10 +269,10 @@ var loadFromDir = async (dir) => {
   return commands;
 };
 var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml", ".yml"]) => {
-  if (import_fs.default.existsSync(path)) return path;
+  if (import_fs2.default.existsSync(path)) return path;
   let hasExtension = /\.(json|ts|js|yaml|yml)$/.test(path.toLowerCase());
   if (!hasExtension) {
-    let extension = allowedExtensions.find((ext) => import_fs.default.existsSync(path + ext));
+    let extension = allowedExtensions.find((ext) => import_fs2.default.existsSync(path + ext));
     path += extension || "";
   }
   return path;
@@ -265,13 +286,13 @@ var c = {
 
 // src/cli.ts
 var import_commander2 = require("commander");
-var import_fs2 = __toESM(require("fs"), 1);
+var import_fs3 = __toESM(require("fs"), 1);
 
 // package.json
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.9",
+  version: "0.20.10",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
@@ -330,14 +351,14 @@ async function cli() {
         if (path.startsWith("/")) return path;
         return `${process.cwd()}/${path}`;
       }).filter((commandPath) => {
-        let exists = import_fs2.default.existsSync(guessExtension(commandPath));
+        let exists = import_fs3.default.existsSync(guessExtension(commandPath));
         if (!exists) {
           console.error(c.red(`Cannot load commands from ${commandPath}. File or directory does not exist.`));
         }
         return exists;
       }).map(async (commandPath) => {
         dd(`Loading commands from ${guessExtension(commandPath)}`);
-        const isDir = import_fs2.default.lstatSync(guessExtension(commandPath)).isDirectory();
+        const isDir = import_fs3.default.lstatSync(guessExtension(commandPath)).isDirectory();
         if (isDir) {
           let commands2 = await loadFromDir(commandPath);
           dd(`Found ${commands2.length} commands in ${commandPath}`, commands2);

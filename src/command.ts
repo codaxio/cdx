@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import defu from "defu";
+import fs from "fs";
 
 export class BaseCommand {
   name: string = "BaseCommand";
@@ -23,6 +25,32 @@ export class BaseCommand {
 
   async run(options: Record<string, any>, command: any) {
     throw new Error("Method run not implemented.")
+  }
+
+
+  readJson(path: string) {
+    return JSON.parse(fs.readFileSync(path, 'utf-8'));
+  }
+
+  writeJson(path: string, data: Record<string, any>) {
+    fs.writeFileSync(path, JSON.stringify(data, null, 2));
+  }
+
+  getConfig(key: string) {
+    // use dot notation to access nested properties
+    return key.split('.').reduce((acc, k) => acc[k], this.config || {});
+  }
+
+  mergeConfig(config: Record<string, any>, key: string) {
+    const final = defu(this.getConfig(key), config);
+    return key.split('.').reduce((acc, k, i, arr) => {
+      if (i === arr.length - 1) {
+        acc[k] = final;
+        return acc;
+      }
+      acc[k] = acc[k] || {};
+      return acc[k];
+    }, this.config || {});
   }
 
 

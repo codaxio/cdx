@@ -11,6 +11,10 @@ declare class BaseCommand {
     constructor(program: Command, config: Record<string, any>);
     register(): Promise<Command>;
     run(options: Record<string, any>, command: any): Promise<void>;
+    readJson(path: string): any;
+    writeJson(path: string, data: Record<string, any>): void;
+    getConfig(key: string): Record<string, any>;
+    mergeConfig(config: Record<string, any>, key: string): Record<string, any>;
     log(...args: any[]): void;
 }
 
