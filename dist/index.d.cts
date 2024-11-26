@@ -14,7 +14,7 @@ declare class BaseCommand {
     exec(command: string, options?: {
         cwd?: string;
         live?: boolean;
-    }): Promise<unknown>;
+    }): Promise<string>;
     readJson(path: string): any;
     writeJson(path: string, data: Record<string, any>): void;
     getConfig(key: string): Record<string, any>;
@@ -37,7 +37,7 @@ declare function createMemoryStream(options: {
 declare function run(command: string, options?: {
     cwd?: string;
     live?: boolean;
-}): Promise<unknown>;
+}): Promise<string>;
 declare const padBetween: (left: string, right: string, padding?: number) => string;
 declare const loadFile: (path: string) => Promise<any>;
 declare const loadBarrelFile: (path: string) => Promise<{

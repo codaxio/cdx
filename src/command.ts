@@ -31,8 +31,8 @@ export class BaseCommand {
   async exec(command: string, options?: {
     cwd?: string;
     live?: boolean;
-  }) {
-    return run(command, options);
+  }): Promise<string> {
+    return await run(command, options);
   }
 
   readJson(path: string) {

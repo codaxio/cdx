@@ -38,7 +38,7 @@ export async function run(command: string, options: {
 } = {
   live: false,
   cwd: process.cwd(),
-}) {
+}): Promise<string> {
  return new Promise((resolve, reject) => {
   var outputStream = createMemoryStream({ live: options.live === true });
   const child = spawn(command, { shell: true, cwd: options.cwd });

@@ -216,7 +216,7 @@ var BaseCommand = class {
     throw new Error("Method run not implemented.");
   }
   async exec(command, options) {
-    return run(command, options);
+    return await run(command, options);
   }
   readJson(path) {
     return JSON.parse(fs2.readFileSync(path, "utf-8"));
@@ -251,7 +251,7 @@ import fs3 from "fs";
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.12",
+  version: "0.20.13",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
