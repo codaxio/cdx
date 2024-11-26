@@ -1,14 +1,14 @@
 import { Command } from "commander";
 import fs from "fs";
 import { c, guessExtension, loadFile, loadFromDir } from "./utils";
-
+import pkg from "../package.json";
 const IS_DEBUG = process.env.DEBUG === "true";
 
 const dd = (...args: any[]) => IS_DEBUG && console.log(...args);
 
 async function cli() {
   const program = new Command()
-  .version("0.0.1")
+  .version(pkg.version)
   .description("CDX CLI")
   .option("-w, --cwd <path>", "Teleport to this directory")
   .option("-c, --config <config>", "Config file")
@@ -17,7 +17,7 @@ async function cli() {
     dd("CDX CLI", options);
     let configFile = options.config || process.env.CDX_CONFIG || "cdx.config.ts";
     dd(`Loading config from ${configFile}`);
-    let commandsPath = options.load.length ? options.load : (process.env.CDX_SCAN?.split(":") || ["./commands"])
+    let commandsPath = options.load?.length ? options.load : (process.env.CDX_SCAN?.split(":") || ["./commands"])
     if (options.cwd) {
       process.chdir(options.cwd);
     }
