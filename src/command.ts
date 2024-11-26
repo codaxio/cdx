@@ -14,7 +14,7 @@ export class BaseCommand {
   async register() {
     const command = this.program.command(this.name).description(this.description);
 
-    this.options.forEach((option) => command.option(option[0], option[1]));
+    this.options.forEach((option) => command.option(option[0], option[1], option[2]));
 
     command.action(async (options, command) => {
      return await this.run(options, command)

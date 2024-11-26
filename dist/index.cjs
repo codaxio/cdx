@@ -129,7 +129,7 @@ var BaseCommand = class {
   ];
   async register() {
     const command = this.program.command(this.name).description(this.description);
-    this.options.forEach((option) => command.option(option[0], option[1]));
+    this.options.forEach((option) => command.option(option[0], option[1], option[2]));
     command.action(async (options, command2) => {
       return await this.run(options, command2);
     });
@@ -292,7 +292,7 @@ var import_fs3 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.10",
+  version: "0.20.11",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
