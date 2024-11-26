@@ -187,7 +187,31 @@ var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml",
   return path;
 };
 var c = {
-  ...chalk
+  blue: chalk.blue,
+  red: chalk.red,
+  green: chalk.green,
+  yellow: chalk.yellow,
+  cyan: chalk.cyan,
+  magenta: chalk.magenta,
+  white: chalk.white,
+  gray: chalk.gray,
+  bold: chalk.bold,
+  underline: chalk.underline,
+  italic: chalk.italic,
+  dim: chalk.dim,
+  bgBlue: chalk.bgBlue,
+  bgRed: chalk.bgRed,
+  bgGreen: chalk.bgGreen,
+  bgYellow: chalk.bgYellow,
+  bgCyan: chalk.bgCyan,
+  bgMagenta: chalk.bgMagenta,
+  bgWhite: chalk.bgWhite,
+  bgGray: chalk.bgGray,
+  bgBlack: chalk.bgBlack,
+  bgRgb: chalk.bgRgb,
+  rgb: chalk.rgb,
+  hex: chalk.hex,
+  bgHex: chalk.bgHex
 };
 
 // src/command.ts

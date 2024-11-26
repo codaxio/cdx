@@ -233,7 +233,31 @@ var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml",
   return path;
 };
 var c = {
-  ...import_chalk.default
+  blue: import_chalk.default.blue,
+  red: import_chalk.default.red,
+  green: import_chalk.default.green,
+  yellow: import_chalk.default.yellow,
+  cyan: import_chalk.default.cyan,
+  magenta: import_chalk.default.magenta,
+  white: import_chalk.default.white,
+  gray: import_chalk.default.gray,
+  bold: import_chalk.default.bold,
+  underline: import_chalk.default.underline,
+  italic: import_chalk.default.italic,
+  dim: import_chalk.default.dim,
+  bgBlue: import_chalk.default.bgBlue,
+  bgRed: import_chalk.default.bgRed,
+  bgGreen: import_chalk.default.bgGreen,
+  bgYellow: import_chalk.default.bgYellow,
+  bgCyan: import_chalk.default.bgCyan,
+  bgMagenta: import_chalk.default.bgMagenta,
+  bgWhite: import_chalk.default.bgWhite,
+  bgGray: import_chalk.default.bgGray,
+  bgBlack: import_chalk.default.bgBlack,
+  bgRgb: import_chalk.default.bgRgb,
+  rgb: import_chalk.default.rgb,
+  hex: import_chalk.default.hex,
+  bgHex: import_chalk.default.bgHex
 };
 
 // src/command.ts
