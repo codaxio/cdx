@@ -60,7 +60,7 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: update changelogs"');
-    this.createPR(changelog);
+    //this.createPR(changelog);
 
     console.log(bumps, manifest, changelog);
   }
@@ -151,9 +151,8 @@ export default class ReleaseCommand extends BaseCommand {
     }
     let files = commits
       .flatMap((commit) => commit.files)
-      .filter((file) => scanDirectories.some((dir: string) => file.startsWith(dir)));
+      .filter((file) => scanDirectories.some((dir: string) => file.startsWith(dir) && !file.startsWith('.')));
     this.log(`${files.length} files changed...`);
-
     let packages = files
       .map((file) => [file.split('/')[0], file.split('/')[1]])
       .map((pkg) => pkg.join('/'))
@@ -165,7 +164,7 @@ export default class ReleaseCommand extends BaseCommand {
       packages.push('.');
     }
 
-    this.log(`${packages.length} packages has changed...\n`);
+    this.log(`${packages.length} packages has changed...\n`, packages);
     const bumps: Bump[] = packages.map((pkg: string) => {
       const packageCommits = commits.filter((commit) => commit.files.some((file) => file.startsWith(pkg == '.' ? '' : pkg)));
       const isMajor = packageCommits.some((commit) => commit.isBreakingChange);
