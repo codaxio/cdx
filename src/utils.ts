@@ -129,7 +129,7 @@ export const guessExtension = (path: string, allowedExtensions: string[] = [".ts
   return path
 }
 export const c = {
- blue: chalk.blue,
+  blue: chalk.blue,
   red: chalk.red,
   green: chalk.green,
   yellow: chalk.yellow,
