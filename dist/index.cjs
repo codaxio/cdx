@@ -233,10 +233,7 @@ var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml",
   return path;
 };
 var c = {
-  blue: import_chalk.default.blue,
-  green: import_chalk.default.green,
-  red: import_chalk.default.red,
-  yellow: import_chalk.default.yellow
+  ...import_chalk.default
 };
 
 // src/command.ts
@@ -297,7 +294,7 @@ var import_fs3 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.13",
+  version: "0.20.14",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"

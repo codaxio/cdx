@@ -129,8 +129,5 @@ export const guessExtension = (path: string, allowedExtensions: string[] = [".ts
   return path
 }
 export const c = {
-  blue: chalk.blue,
-  green: chalk.green,
-  red: chalk.red,
-  yellow: chalk.yellow,
+ ...chalk
 }

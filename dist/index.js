@@ -187,10 +187,7 @@ var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml",
   return path;
 };
 var c = {
-  blue: chalk.blue,
-  green: chalk.green,
-  red: chalk.red,
-  yellow: chalk.yellow
+  ...chalk
 };
 
 // src/command.ts
@@ -251,7 +248,7 @@ import fs3 from "fs";
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.13",
+  version: "0.20.14",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
