@@ -14,12 +14,14 @@ export class BaseCommand {
 
     this.options.forEach((option) => command.option(option[0], option[1]));
 
-    command.action(this.run.bind(this));
+    command.action(async (options, command) => {
+     return await this.run(options, command)
+    });
 
     return command;
   }
 
-  run() {
+  async run(options, command) {
     throw new Error("Method run not implemented.")
   }
 
