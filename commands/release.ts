@@ -55,11 +55,9 @@ export default class ReleaseCommand extends BaseCommand {
     });
 
     await this.applyBumps(bumps);
-    await this.exec('git add .');
-    await this.exec('git commit -m "chore: bump versions"');
     this.updateChangelogs(bumps);
     await this.exec('git add .');
-    await this.exec('git commit -m "chore: update changelogs"');
+    await this.exec('git commit -m "chore: bump versions & update changelogs"');
     //this.createPR(changelog);
 
     console.log(bumps, manifest, changelog);
