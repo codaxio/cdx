@@ -21,7 +21,7 @@ export class BaseCommand {
     return command;
   }
 
-  async run(options, command) {
+  async run(options: Record<string, any>, command: any) {
     throw new Error("Method run not implemented.")
   }
 

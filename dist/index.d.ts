@@ -10,7 +10,7 @@ declare class BaseCommand {
     options: string[][];
     constructor(program: Command, config: Record<string, any>);
     register(): Promise<Command>;
-    run(): void;
+    run(options: Record<string, any>, command: any): Promise<void>;
     log(...args: any[]): void;
 }
 
