@@ -35,7 +35,10 @@ export class BaseCommand {
     return await run(command, options);
   }
 
-  readJson(path: string) {
+  readJson(path: string, defaultValue: Record<string, any> = {}) {
+    if (!fs.existsSync(path)) {
+      return defaultValue;
+    }
     return JSON.parse(fs.readFileSync(path, 'utf-8'));
   }
 

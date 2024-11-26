@@ -15,7 +15,7 @@ declare class BaseCommand {
         cwd?: string;
         live?: boolean;
     }): Promise<string>;
-    readJson(path: string): any;
+    readJson(path: string, defaultValue?: Record<string, any>): any;
     writeJson(path: string, data: Record<string, any>): void;
     getConfig(key: string): Record<string, any>;
     mergeConfig(config: Record<string, any>, key: string): Record<string, any>;

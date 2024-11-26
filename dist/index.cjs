@@ -285,7 +285,10 @@ var BaseCommand = class {
   async exec(command, options) {
     return await run(command, options);
   }
-  readJson(path) {
+  readJson(path, defaultValue = {}) {
+    if (!import_fs2.default.existsSync(path)) {
+      return defaultValue;
+    }
     return JSON.parse(import_fs2.default.readFileSync(path, "utf-8"));
   }
   writeJson(path, data) {
@@ -318,7 +321,7 @@ var import_fs3 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.16",
+  version: "0.20.17",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
