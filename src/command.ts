@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import defu from "defu";
 import fs from "fs";
+import { run } from "./utils";
 
 export class BaseCommand {
   name: string = "BaseCommand";
@@ -27,6 +28,12 @@ export class BaseCommand {
     throw new Error("Method run not implemented.")
   }
 
+  async exec(command: string, options?: {
+    cwd?: string;
+    live?: boolean;
+  }) {
+    return run(command, options);
+  }
 
   readJson(path: string) {
     return JSON.parse(fs.readFileSync(path, 'utf-8'));

@@ -70,56 +70,11 @@ var defuArrayFn = createDefu((object, key, currentValue) => {
 });
 
 // src/command.ts
-import fs from "fs";
-var BaseCommand = class {
-  constructor(program, config) {
-    this.program = program;
-    this.config = config;
-  }
-  name = "BaseCommand";
-  description = "Command";
-  options = [
-    ["-h, --help", "Show help"]
-  ];
-  async register() {
-    const command = this.program.command(this.name).description(this.description);
-    this.options.forEach((option) => command.option(option[0], option[1], option[2]));
-    command.action(async (options, command2) => {
-      return await this.run(options, command2);
-    });
-    return command;
-  }
-  async run(options, command) {
-    throw new Error("Method run not implemented.");
-  }
-  readJson(path) {
-    return JSON.parse(fs.readFileSync(path, "utf-8"));
-  }
-  writeJson(path, data) {
-    fs.writeFileSync(path, JSON.stringify(data, null, 2));
-  }
-  getConfig(key) {
-    return key.split(".").reduce((acc, k) => acc[k], this.config || {});
-  }
-  mergeConfig(config, key) {
-    const final = defu(this.getConfig(key), config);
-    return key.split(".").reduce((acc, k, i, arr) => {
-      if (i === arr.length - 1) {
-        acc[k] = final;
-        return acc;
-      }
-      acc[k] = acc[k] || {};
-      return acc[k];
-    }, this.config || {});
-  }
-  log(...args) {
-    console.log(`${this.name}:`, ...args);
-  }
-};
+import fs2 from "fs";
 
 // src/utils.ts
 import { spawn } from "child_process";
-import fs2 from "fs";
+import fs from "fs";
 import chalk from "chalk";
 import { Writable } from "stream";
 var MemoryWritable = class extends Writable {
@@ -181,7 +136,7 @@ var loadFile = async (path) => {
       content = JSON.parse(String(yaml));
       break;
     case "json":
-      let json = JSON.parse(fs2.readFileSync(path).toString());
+      let json = JSON.parse(fs.readFileSync(path).toString());
       content = json;
       break;
     case "ts":
@@ -207,13 +162,13 @@ var loadBarrelFile = async (path) => {
 };
 var loadFromDir = async (dir) => {
   let commands = [];
-  let files = fs2.readdirSync(dir);
+  let files = fs.readdirSync(dir);
   if (files.includes("index.ts")) commands.push(...await loadBarrelFile(`${dir}/index.ts`));
   else if (files.includes("index.js")) commands.push(...await loadBarrelFile(`${dir}/index.js`));
   else {
     for (let file of files) {
       let path = `${dir}/${file}`;
-      let isDir = fs2.lstatSync(path).isDirectory();
+      let isDir = fs.lstatSync(path).isDirectory();
       if (isDir) commands.push(...await loadFromDir(path));
       else commands.push({ name: String(
         file.split(".").shift() || `command-${commands.length}`
@@ -223,10 +178,10 @@ var loadFromDir = async (dir) => {
   return commands;
 };
 var guessExtension = (path, allowedExtensions = [".ts", ".js", ".json", ".yaml", ".yml"]) => {
-  if (fs2.existsSync(path)) return path;
+  if (fs.existsSync(path)) return path;
   let hasExtension = /\.(json|ts|js|yaml|yml)$/.test(path.toLowerCase());
   if (!hasExtension) {
-    let extension = allowedExtensions.find((ext) => fs2.existsSync(path + ext));
+    let extension = allowedExtensions.find((ext) => fs.existsSync(path + ext));
     path += extension || "";
   }
   return path;
@@ -238,6 +193,56 @@ var c = {
   yellow: chalk.yellow
 };
 
+// src/command.ts
+var BaseCommand = class {
+  constructor(program, config) {
+    this.program = program;
+    this.config = config;
+  }
+  name = "BaseCommand";
+  description = "Command";
+  options = [
+    ["-h, --help", "Show help"]
+  ];
+  async register() {
+    const command = this.program.command(this.name).description(this.description);
+    this.options.forEach((option) => command.option(option[0], option[1], option[2]));
+    command.action(async (options, command2) => {
+      return await this.run(options, command2);
+    });
+    return command;
+  }
+  async run(options, command) {
+    throw new Error("Method run not implemented.");
+  }
+  async exec(command, options) {
+    return run(command, options);
+  }
+  readJson(path) {
+    return JSON.parse(fs2.readFileSync(path, "utf-8"));
+  }
+  writeJson(path, data) {
+    fs2.writeFileSync(path, JSON.stringify(data, null, 2));
+  }
+  getConfig(key) {
+    return key.split(".").reduce((acc, k) => acc[k], this.config || {});
+  }
+  mergeConfig(config, key) {
+    const final = defu(this.getConfig(key), config);
+    return key.split(".").reduce((acc, k, i, arr) => {
+      if (i === arr.length - 1) {
+        acc[k] = final;
+        return acc;
+      }
+      acc[k] = acc[k] || {};
+      return acc[k];
+    }, this.config || {});
+  }
+  log(...args) {
+    console.log(`${this.name}:`, ...args);
+  }
+};
+
 // src/cli.ts
 import { Command as Command2 } from "commander";
 import fs3 from "fs";
@@ -246,7 +251,7 @@ import fs3 from "fs";
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.20.11",
+  version: "0.20.12",
   module: "src/index.ts",
   bin: {
     cdx: "start.sh"
