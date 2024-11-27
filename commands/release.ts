@@ -53,7 +53,8 @@ export default class ReleaseCommand extends BaseCommand {
     // create release branch
     const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
     if (branchExists === 'no') {
-      await this.exec(`git checkout -b ${releaseBranch} main 2>&1`);
+      await this.exec(`git checkout -B ${releaseBranch} main 2>&1`);
+      await this.exec(`git reset --hard && git clean --force -df 2>&1`);
       await this.exec(`git push origin ${releaseBranch} --set-upstream 2>&1`);
     }
     await this.exec(`git checkout -B ${PRBranch} 2>&1`);
