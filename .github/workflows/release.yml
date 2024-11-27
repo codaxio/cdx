@@ -1,13 +1,15 @@
 on:
-  push:
+  pull_request:
+    types: [opened, closed, synchronize]
     branches:
-      - feature/autorelease-dev
+      - release/dev
+  #    - feature/autorelease-dev
  
-  workflow_dispatch:
-    inputs:
-      ref:
-        description: 'Ref'
-        required: true
+  #workflow_dispatch:
+  #  inputs:
+  #    ref:
+  #      description: 'Ref'
+  #      required: true
 
 
 permissions:
@@ -17,6 +19,12 @@ permissions:
 name: release
 
 jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo The PR was merged
   release:
     runs-on: ubuntu-latest
     steps:
