@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - feature/autorelease-dev
+  on_workflow_dispatch:
+  
 
 permissions:
   contents: write
@@ -22,6 +24,8 @@ jobs:
       #    repositories: "release-please-pnpm-mororepo-poc"
 
       - uses: actions/checkout@v4
+      - name: Get current branch
+        run: git branch --show-current
       - run: echo "Hello, World! ${{ github.ref }}"
         shell: bash
       - run: |
