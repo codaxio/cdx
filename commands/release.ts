@@ -76,13 +76,19 @@ export default class ReleaseCommand extends BaseCommand {
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs" 2>&1');
     await this.exec(`git push origin ${PRBranch} --force --set-upstream 2>&1`);
-    // if release branch does not exist, create it first
-    // go back to the current branch
 
     this.createOrUpdatePR({bumps, changelog, releaseBranch, PRBranch});
-    await this.exec(`git checkout ${currentBranch} 2>&1`);
 
-    //console.log(bumps, manifest, changelog);
+    this.createTags(bumps);
+
+    await this.exec(`git checkout ${currentBranch} 2>&1`);
+  }
+
+  async createTags(bumps: Bump[]) {
+    for (const bump of bumps) {
+      await this.exec(`git tag -a ${bump.newTag} -m "chore: release ${bump.newTag}" 2>&1`);
+      await this.exec(`git push origin ${bump.newTag} 2>&1`);
+    }
   }
 
   async createOrUpdatePR({
