@@ -54,9 +54,11 @@ export default class ReleaseCommand extends BaseCommand {
     const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/origin/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
     console.log({branchExists});
     if (branchExists === 'no') {
+      this.log(`Creating release branch ${releaseBranch}`);
       await this.exec(`git checkout -B ${releaseBranch} main 2>&1`);
       await this.exec(`git reset --hard && git clean --force -df 2>&1`);
       await this.exec(`git push origin ${releaseBranch} --set-upstream 2>&1`);
+      this.log(`Creating release branch ${releaseBranch}: done`);
     }
     await this.exec(`git checkout -B ${PRBranch} main 2>&1`);
     // reset to 
@@ -77,7 +79,6 @@ export default class ReleaseCommand extends BaseCommand {
     await this.exec(`git push origin ${PRBranch} --force --set-upstream 2>&1`);
     // if release branch does not exist, create it first
     // go back to the current branch
-    await this.exec(`git checkout ${currentBranch} 2>&1`);
 
     this.createPR({bumps, changelog, releaseBranch, PRBranch});
 
