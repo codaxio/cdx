@@ -50,6 +50,12 @@ export default class ReleaseCommand extends BaseCommand {
     const PRBranch = 'feature/autorelease-prod';
     const releaseBranch = 'release/prod';
     const currentBranch = (await this.exec('git branch --show-current')).replace('\n', '');
+    // create release branch
+    const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
+    if (branchExists === 'no') {
+      await this.exec(`git checkout -b ${releaseBranch} 2>&1`);
+      await this.exec(`git push origin ${releaseBranch} --set-upstream 2>&1`);
+    }
     await this.exec(`git checkout -B ${PRBranch} 2>&1`);
     // reset to 
     this.writeJson('.release-manifest.json', {
@@ -68,11 +74,8 @@ export default class ReleaseCommand extends BaseCommand {
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
     await this.exec(`git push origin ${PRBranch} --force`);
     // if release branch does not exist, create it first
-    await this.exec(`git checkout ${releaseBranch} || git checkout -b ${releaseBranch} 2>&1`);
-    await this.exec(`git push origin ${releaseBranch} --set-upstream`);
     // go back to the current branch
     await this.exec(`git checkout ${currentBranch}`);
-
 
     this.createPR({bumps, changelog, releaseBranch, PRBranch});
 
