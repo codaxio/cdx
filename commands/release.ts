@@ -47,11 +47,12 @@ export default class ReleaseCommand extends BaseCommand {
       return;
     }
     const changelog = this.generateChangelog({ bumps, commandConfig });
-    const releaseBranch = 'feature/autorelease-prod';
-    const currentBranch = await this.exec('git branch --show-current');
+    const PRBranch = 'feature/autorelease-prod';
+    const releaseBranch = 'release/prod';
+    const currentBranch = (await this.exec('git branch --show-current')).replace('\n', '');
     console.log({currentBranch});
     if (42) process.exit(0);
-    await this.exec(`git checkout -B ${releaseBranch}- 2>&1`);
+    await this.exec(`git checkout -B ${PRBranch} 2>&1`);
     // reset to 
     this.writeJson('.release-manifest.json', {
       bumps,
@@ -62,8 +63,8 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
-    await this.exec(`git push origin ${releaseBranch} --force`);
-    this.createPR({bumps, changelog, releaseBranch});
+    await this.exec(`git push origin ${PRBranch} --force`);
+    this.createPR({bumps, changelog, releaseBranch, PRBranch});
 
     console.log(bumps, manifest, changelog);
   }
@@ -72,13 +73,15 @@ export default class ReleaseCommand extends BaseCommand {
     changelog,
     bumps,
     releaseBranch,
+    PRBranch,
   }: {
     changelog: string;
     releaseBranch: string;
+    PRBranch: string;
     bumps: Bump[];
   }) {
     await this.exec('gh label create "autorelease: pending" -f --description "Preparing auto-release" --color E99695');
-    await this.exec(`gh pr create -B ${releaseBranch} --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`);
+    await this.exec(`gh pr create -B ${releaseBranch} -H ${PRBranch} --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`);
   }
 
   updateChangelogs(bumps: Bump[]) {
@@ -197,7 +200,7 @@ export default class ReleaseCommand extends BaseCommand {
         )}`,
       );
       return {
-        pkg,
+        pkg: pkg === '.' ? ' ' : pkg,
         json,
         root: pkg,
         changelog: '',
