@@ -79,7 +79,9 @@ export default class ReleaseCommand extends BaseCommand {
     bumps: Bump[];
   }) {
     await this.exec('gh label create "autorelease: pending" -f --description "Preparing auto-release" --color E99695');
-    await this.exec(`echo gh pr create -B ${releaseBranch} -H ${PRBranch} --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`);
+    await this.exec(`gh pr create -B ${releaseBranch} -H ${PRBranch} --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
+      live: true,
+    });
   }
 
   updateChangelogs(bumps: Bump[]) {
