@@ -46,10 +46,8 @@ jobs:
         run: git branch --show-current
         # Show the target branch
       - run: |
-          echo "head_ref! ${{ github.head_ref }}"
-          echo "base_ref! ${{ github.base_ref }}"
-          echo "${VARS_JSON}"
-          echo "${GITHUB_JSON}"
+          echo "head_ref! ${{ github.event.pull_request.head.ref }}"
+          echo "base_ref! ${{ github.event.pull_request.base.ref }}"
           echo "${EVENT_JSON}"
         shell: bash
         env:
