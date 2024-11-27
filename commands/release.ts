@@ -79,13 +79,13 @@ export default class ReleaseCommand extends BaseCommand {
     // if release branch does not exist, create it first
     // go back to the current branch
 
-    this.createPR({bumps, changelog, releaseBranch, PRBranch});
+    this.createOrUpdatePR({bumps, changelog, releaseBranch, PRBranch});
     await this.exec(`git checkout ${currentBranch} 2>&1`);
 
     //console.log(bumps, manifest, changelog);
   }
 
-  async createPR({
+  async createOrUpdatePR({
     changelog,
     bumps,
     releaseBranch,
@@ -97,10 +97,22 @@ export default class ReleaseCommand extends BaseCommand {
     bumps: Bump[];
   }) {
     await this.exec('gh label create "autorelease: pending" -f --description "Preparing auto-release" --color E99695');
-    const pullRequest = await this.exec(`gh pr create -B "${releaseBranch}" --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
-      live: true,
-    });
-    this.log(`New PR created: ${pullRequest}`);
+
+    const exists = await this.exec(`gh pr list --state open --label "autorelease: pending" --json number`);
+    if (exists) {
+      const pr = JSON.parse(exists);
+      this.log(`Updating PR: ${pr[0].number}`);
+      await this.exec(`gh pr edit ${pr[0].number} --body "${changelog}"`, {
+        live: true,
+      });
+      return;
+    } else {
+
+      const pullRequest = await this.exec(`gh pr create -B "${releaseBranch}" --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
+        live: true,
+      });
+      this.log(`New PR created: ${pullRequest}`);
+    }
   }
 
   updateChangelogs(bumps: Bump[]) {
