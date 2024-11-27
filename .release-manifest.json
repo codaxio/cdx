@@ -1,0 +1,126 @@
+{
+  "bumps": [
+    {
+      "pkg": ".",
+      "json": {
+        "name": "@codaxio/cdx",
+        "type": "module",
+        "version": "0.20.18",
+        "module": "src/index.ts",
+        "bin": {
+          "cdx": "start.sh"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/codaxio/cdx.git"
+        },
+        "description": "Best CLI ever, period.",
+        "main": "dist/index.js",
+        "types": "dist/index.d.ts",
+        "files": [
+          "dist",
+          "src"
+        ],
+        "scripts": {
+          "build:publish": "pnpm i && pnpm build && pnpm version patch && pnpm publish",
+          "start": "pnpm tsx --watch src/index.ts",
+          "build": "tsup src/index.ts --dts --format cjs,esm --out-dir dist --clean",
+          "test": "vitest run",
+          "test:watch": "vitest",
+          "lint": "eslint .",
+          "lint:fix": "eslint . --fix"
+        },
+        "keywords": [],
+        "author": "Codaxio",
+        "license": "UNLICENSED",
+        "namespace": "@codaxio",
+        "dependencies": {
+          "@types/node": "^20.0.0",
+          "chalk": "^5.3.0",
+          "commander": "^12.1.0",
+          "defu": "^6.1.4",
+          "inquirer": "^12.1.0"
+        },
+        "devDependencies": {
+          "tsup": "^8.3.5",
+          "typescript": "^5.7.2"
+        }
+      },
+      "root": ".",
+      "changelog": "## [0.21.0](https://github.com/undefined/compare/@codaxio/cdx-v0.20.18...@codaxio/cdx-v0.21.0) (2024-11-27)\n\n### Features\n\n* force release branch ([31da5eb](https://github.com/undefined/commit/31da5eb9c420c098f356876f2606fd70892dda63))\n* create label ([c19c6d7](https://github.com/undefined/commit/c19c6d74139d459bf06d3b94799f0afd22982657))\n* create PR ([3908637](https://github.com/undefined/commit/3908637f7ecafef7be70f90ed749dd2467d38190))\n* reduce commit ([d384438](https://github.com/undefined/commit/d3844386d3a4b5141bbd219dc3cbdf6324ae9692))\n* test ([43187a7](https://github.com/undefined/commit/43187a734af5df1799f83ef9cc1c391417abf635))\n* single package ([250bcd4](https://github.com/undefined/commit/250bcd4f3452d7555f99ac643c7027e6e9096eb4))\n\n",
+      "type": "minor",
+      "major": false,
+      "minor": true,
+      "patch": false,
+      "current": "0.20.18",
+      "currentTag": "@codaxio/cdx-v0.20.18",
+      "new": "0.21.0",
+      "newTag": "@codaxio/cdx-v0.21.0",
+      "commits": [
+        {
+          "hash": "31da5eb9c420c098f356876f2606fd70892dda63",
+          "timestamp": "2024-11-27T00:24:14.000Z",
+          "message": "force release branch",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "commands/release.ts"
+          ]
+        },
+        {
+          "hash": "c19c6d74139d459bf06d3b94799f0afd22982657",
+          "timestamp": "2024-11-27T00:23:00.000Z",
+          "message": "create label",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "commands/release.ts"
+          ]
+        },
+        {
+          "hash": "3908637f7ecafef7be70f90ed749dd2467d38190",
+          "timestamp": "2024-11-27T00:18:53.000Z",
+          "message": "create PR",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "commands/release.ts"
+          ]
+        },
+        {
+          "hash": "d3844386d3a4b5141bbd219dc3cbdf6324ae9692",
+          "timestamp": "2024-11-26T23:57:02.000Z",
+          "message": "reduce commit",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "commands/release.ts"
+          ]
+        },
+        {
+          "hash": "43187a734af5df1799f83ef9cc1c391417abf635",
+          "timestamp": "2024-11-26T23:55:33.000Z",
+          "message": "test",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "commands/release.ts"
+          ]
+        },
+        {
+          "hash": "250bcd4f3452d7555f99ac643c7027e6e9096eb4",
+          "timestamp": "2024-11-26T23:48:21.000Z",
+          "message": "single package",
+          "type": "feat",
+          "isBreakingChange": false,
+          "files": [
+            "cli.config.ts",
+            "commands/release.ts"
+          ]
+        }
+      ],
+      "depsToBump": {}
+    }
+  ],
+  "changelog": ":robot: I have created a release *beep* *boop*\n---\n<details><summary>@codaxio/cdx: 0.21.0</summary>\n\n## [0.21.0](https://github.com/undefined/compare/@codaxio/cdx-v0.20.18...@codaxio/cdx-v0.21.0) (2024-11-27)\n\n### Features\n\n* force release branch ([31da5eb](https://github.com/undefined/commit/31da5eb9c420c098f356876f2606fd70892dda63))\n* create label ([c19c6d7](https://github.com/undefined/commit/c19c6d74139d459bf06d3b94799f0afd22982657))\n* create PR ([3908637](https://github.com/undefined/commit/3908637f7ecafef7be70f90ed749dd2467d38190))\n* reduce commit ([d384438](https://github.com/undefined/commit/d3844386d3a4b5141bbd219dc3cbdf6324ae9692))\n* test ([43187a7](https://github.com/undefined/commit/43187a734af5df1799f83ef9cc1c391417abf635))\n* single package ([250bcd4](https://github.com/undefined/commit/250bcd4f3452d7555f99ac643c7027e6e9096eb4))\n\n</details>\n\n"
+}
