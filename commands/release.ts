@@ -57,7 +57,7 @@ export default class ReleaseCommand extends BaseCommand {
       await this.exec(`git reset --hard && git clean --force -df 2>&1`);
       await this.exec(`git push origin ${releaseBranch} --set-upstream 2>&1`);
     }
-    await this.exec(`git checkout -B ${PRBranch} 2>&1`);
+    await this.exec(`git checkout -B ${PRBranch} main 2>&1`);
     // reset to 
     this.writeJson('.release-manifest.json', {
       bumps: bumps.map((bump) => {
