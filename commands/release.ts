@@ -62,6 +62,13 @@ export default class ReleaseCommand extends BaseCommand {
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
     await this.exec(`git push origin ${PRBranch} --force`);
+    // if release branch does not exist, create it first
+    await this.exec(`git checkout ${releaseBranch} || git checkout -b ${releaseBranch} 2>&1`);
+    await this.exec(`git push origin ${releaseBranch} --set-upstream`);
+    // go back to the current branch
+    await this.exec(`git checkout ${currentBranch}`);
+
+
     this.createPR({bumps, changelog, releaseBranch, PRBranch});
 
     console.log(bumps, manifest, changelog);
@@ -79,7 +86,7 @@ export default class ReleaseCommand extends BaseCommand {
     bumps: Bump[];
   }) {
     await this.exec('gh label create "autorelease: pending" -f --description "Preparing auto-release" --color E99695');
-    await this.exec(`gh pr create -B ${releaseBranch} -H ${PRBranch} --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
+    await this.exec(`gh pr create -B "${releaseBranch}" -H "${PRBranch}" --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
       live: true,
     });
   }
