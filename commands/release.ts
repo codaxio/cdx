@@ -47,19 +47,28 @@ export default class ReleaseCommand extends BaseCommand {
       return;
     }
     const changelog = this.generateChangelog({ bumps, commandConfig });
-    const PRBranch = 'feature/autorelease-prod';
-    const releaseBranch = 'release/prod';
+    // Here the wanted scenario.
+    // We want to trigger this job when we open a PR between a branch targeting a release branch.
+    // The job will then create a new PR with the changelog and the new version.
+    // For example if this workflow is called from main to release/dev, it will :
+    // Checkout release/dev
+    // Create new branch from release/dev
+    // Bump versions
+    // Update changelogs
+    // Push this branch
+    // Create a PR from this branch to release/dev
+    const releaseBranch = 'release/dev';
     const currentBranch = (await this.exec('git branch --show-current')).replace('\n', '');
     // create release branch
     const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/origin/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
     if (branchExists === 'no') {
       this.log(`Creating release branch ${releaseBranch}`);
-      await this.exec(`git checkout -B ${releaseBranch} main 2>&1`);
+      await this.exec(`git checkout -B ${releaseBranch} origin/${releaseBranch} 2>&1`);
       await this.exec(`git reset --hard && git clean --force -df 2>&1`);
       await this.exec(`git push origin ${releaseBranch} --set-upstream 2>&1`);
       this.log(`Creating release branch ${releaseBranch}: done`);
     }
-    await this.exec(`git checkout -B ${PRBranch} main 2>&1`);
+    await this.exec(`git checkout -B ${currentBranch} main 2>&1`);
     // reset to 
     this.writeJson('.release-manifest.json', {
       bumps: bumps.map((bump) => {
@@ -75,9 +84,9 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs" 2>&1');
-    await this.exec(`git push origin ${PRBranch} --force --set-upstream 2>&1`);
+    await this.exec(`git push origin ${currentBranch} --force --set-upstream 2>&1`);
 
-    this.createOrUpdatePR({bumps, changelog, releaseBranch, PRBranch});
+    this.createOrUpdatePR({bumps, changelog, releaseBranch, currentBranch});
 
     this.createTags(bumps);
 
