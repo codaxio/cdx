@@ -58,13 +58,20 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
-    //this.createPR(changelog);
+    await this.exec('git push origin release/release-prod');
+    this.createPR({bumps, changelog});
 
     console.log(bumps, manifest, changelog);
   }
 
-  async createPR(changelog: string) {
-    await this.exec(`gh pr create -B main --title "chore: release" --body "${changelog}"`);
+  async createPR({
+    changelog,
+    bumps,
+  }: {
+    changelog: string;
+    bumps: Bump[];
+  }) {
+    await this.exec(`gh pr create -B main --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`);
   }
 
   updateChangelogs(bumps: Bump[]) {
@@ -316,6 +323,7 @@ export type Commit = {
 };
 
 export type Bump = {
+  pkg: string;
   changelog: string;
   root: string;
   type: 'major' | 'minor' | 'patch';
