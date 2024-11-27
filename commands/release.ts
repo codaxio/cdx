@@ -47,8 +47,8 @@ export default class ReleaseCommand extends BaseCommand {
       return;
     }
     const changelog = this.generateChangelog({ bumps, commandConfig });
-
-    await this.exec('git checkout -B release/release-prod 2>&1');
+    const releaseBranch = 'release/release-prod';
+    await this.exec(`git checkout -B ${releaseBranch} 2>&1`);
     this.writeJson('.release-manifest.json', {
       bumps,
       changelog,
@@ -58,7 +58,7 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
-    await this.exec('git push origin release/release-prod');
+    await this.exec(`git push origin ${releaseBranch} --force`);
     this.createPR({bumps, changelog});
 
     console.log(bumps, manifest, changelog);
