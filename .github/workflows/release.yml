@@ -2,8 +2,13 @@ on:
   push:
     branches:
       - feature/autorelease-dev
-  on_workflow_dispatch:
-  
+ 
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref'
+        required: true
+
 
 permissions:
   contents: write
