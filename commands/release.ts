@@ -52,7 +52,6 @@ export default class ReleaseCommand extends BaseCommand {
     const currentBranch = (await this.exec('git branch --show-current')).replace('\n', '');
     // create release branch
     const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/origin/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
-    console.log({branchExists});
     if (branchExists === 'no') {
       this.log(`Creating release branch ${releaseBranch}`);
       await this.exec(`git checkout -B ${releaseBranch} main 2>&1`);
@@ -81,6 +80,7 @@ export default class ReleaseCommand extends BaseCommand {
     // go back to the current branch
 
     this.createPR({bumps, changelog, releaseBranch, PRBranch});
+    await this.exec(`git checkout ${currentBranch} 2>&1`);
 
     //console.log(bumps, manifest, changelog);
   }
@@ -97,9 +97,10 @@ export default class ReleaseCommand extends BaseCommand {
     bumps: Bump[];
   }) {
     await this.exec('gh label create "autorelease: pending" -f --description "Preparing auto-release" --color E99695');
-    await this.exec(`gh pr create -B "${releaseBranch}" --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
+    const pullRequest = await this.exec(`gh pr create -B "${releaseBranch}" --title "chore: release ${bumps.map(b => b.pkg)}" --body "${changelog}" --label "autorelease: pending"`, {
       live: true,
     });
+    this.log(`New PR created: ${pullRequest}`);
   }
 
   updateChangelogs(bumps: Bump[]) {
@@ -196,7 +197,7 @@ export default class ReleaseCommand extends BaseCommand {
       packages.push('.');
     }
 
-    this.log(`${packages.length} packages has changed...\n`, packages);
+    this.log(`${packages.length} packages has changed...\n`);
     const bumps: Bump[] = packages.map((pkg: string) => {
       const packageCommits = commits.filter((commit) => commit.files.some((file) => file.startsWith(pkg == '.' ? '' : pkg)));
       const isMajor = packageCommits.some((commit) => commit.isBreakingChange);
