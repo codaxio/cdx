@@ -45,14 +45,18 @@ jobs:
       - name: Get current branch
         run: git branch --show-current
         # Show the target branch
-      - run: echo "Hello, World! ${{ github.pull_request.head.ref }}"
-        shell: bash
-        # Show the base branch
-      - run: echo "Hello, World! ${{ github.pull_request.base.ref }}"
-        shell: bash
       - run: |
-          env | grep GITHUB_REF
-      - run: echo  ${{ github.event }}
+          echo "head_ref! ${{ github.head_ref }}"
+          echo "base_ref! ${{ github.base_ref }}"
+          echo "${VARS_JSON}"
+          echo "${GITHUB_JSON}"
+          echo "${EVENT_JSON}"
+        shell: bash
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+          GITHUB_JSON: ${{ toJSON(github) }}
+          EVENT_JSON: ${{ toJSON(github.event) }}
+        # Show the base branch
       - run: gh pr view ${{ github.event.number }}
 
       #- uses: codaxio/cdx@v0.14.0
