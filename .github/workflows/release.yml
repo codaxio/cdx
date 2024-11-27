@@ -1,6 +1,5 @@
 on:
   pull_request:
-    types: [opened, closed, synchronize]
     branches:
       - release/dev
   #    - feature/autorelease-dev
