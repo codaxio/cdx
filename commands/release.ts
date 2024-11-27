@@ -72,7 +72,7 @@ export default class ReleaseCommand extends BaseCommand {
     this.updateChangelogs(bumps);
     await this.exec('git add .');
     await this.exec('git commit -m "chore: bump versions & update changelogs"');
-    await this.exec(`git push origin ${PRBranch} --force`);
+    await this.exec(`git push origin ${PRBranch} --force --set-upstream 2>&1`);
     // if release branch does not exist, create it first
     // go back to the current branch
     await this.exec(`git checkout ${currentBranch}`);
