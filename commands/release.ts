@@ -53,8 +53,13 @@ export default class ReleaseCommand extends BaseCommand {
     await this.exec(`git checkout -B ${PRBranch} 2>&1`);
     // reset to 
     this.writeJson('.release-manifest.json', {
-      bumps,
-      changelog,
+      bumps: bumps.map((bump) => {
+        return {
+          new: bump.new,
+          root: bump.root,
+          changelog: bump.changelog,
+        };
+      }),
     });
 
     await this.applyBumps(bumps);
