@@ -44,7 +44,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Get current branch
         run: git branch --show-current
-      - run: echo "Hello, World! ${{ github.ref }}"
+        # Show the target branch
+      - run: echo "Hello, World! ${{ github.pull_request.head.ref }}"
+        shell: bash
+        # Show the base branch
+      - run: echo "Hello, World! ${{ github.pull_request.base.ref }}"
         shell: bash
       - run: |
           env | grep GITHUB_REF
