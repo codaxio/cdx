@@ -46,6 +46,8 @@ jobs:
         shell: bash
       - run: |
           env | grep GITHUB_REF
+      - run: echo  ${{ github.event }}
+      - run: gh pr view ${{ github.event.number }}
 
       #- uses: codaxio/cdx@v0.14.0
       #  with:
