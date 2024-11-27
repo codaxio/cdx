@@ -51,7 +51,8 @@ export default class ReleaseCommand extends BaseCommand {
     const releaseBranch = 'release/prod';
     const currentBranch = (await this.exec('git branch --show-current')).replace('\n', '');
     // create release branch
-    const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
+    const branchExists = (await this.exec(`git show-ref --verify --quiet refs/heads/origin/${releaseBranch} && echo "yes" || echo "no"`)).replace('\n', '');
+    console.log({branchExists});
     if (branchExists === 'no') {
       await this.exec(`git checkout -B ${releaseBranch} main 2>&1`);
       await this.exec(`git reset --hard && git clean --force -df 2>&1`);
@@ -191,7 +192,6 @@ export default class ReleaseCommand extends BaseCommand {
     if (hasRootPackageJson) {
       let rootFiles = commits.flatMap((commit) => commit.files)
       .filter((file) => !files.includes(file));
-      console.log({rootFiles});
       packages.push('.');
     }
 
