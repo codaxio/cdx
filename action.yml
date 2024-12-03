@@ -42,5 +42,5 @@ runs:
         FORCE_COLOR: 3
         CDX_INSTALL_ALL: true
       run: |
-        (cd ${{ github.action_path }} && pnpm i)
+        (cd ${{ github.action_path }} && pnpm i) > /dev/null 
         bash ${{ github.action_path }}/start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
