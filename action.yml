@@ -41,4 +41,8 @@ runs:
         TERM: xterm-color
         FORCE_COLOR: 3
         CDX_INSTALL_ALL: true
-      run: pnpm i && ./start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
+      run: |
+        pnpm i
+        pwd
+        ls -la
+        ./start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
