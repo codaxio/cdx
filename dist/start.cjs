@@ -3680,7 +3680,7 @@ var c = {
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.27.0",
+  version: "0.28.0",
   publishToCodeArtifact: true,
   module: "src/index.ts",
   bin: {

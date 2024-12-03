@@ -3,15 +3,23 @@ import { ExecSyncOptions, ExecException } from 'child_process';
 import { Writable } from 'stream';
 import * as chalk from 'chalk';
 
+type CommandInput = {
+    options: Record<string, any>;
+    args: string[];
+    command: any;
+    config: Record<string, any>;
+};
 declare class BaseCommand {
     program: Command;
     config: Record<string, any>;
     name: string;
     description: string;
     options: [string, string, any?][];
+    configKey: string;
+    defaultConfig: Record<string, any>;
     constructor(program: Command, config: Record<string, any>);
     register(): Promise<Command>;
-    run(options: Record<string, any>, command: any): Promise<void>;
+    run(inputs: CommandInput): Promise<void>;
     execute(command: string, options?: ExecSyncOptions & {
         stdout?: Writable;
         stderr?: Writable;
@@ -103,4 +111,4 @@ declare const c: {
 
 declare function cli(): Promise<void>;
 
-export { BaseCommand, c, cli, createMemoryStream, dd, execute, executeSync, guessExtension, loadBarrelFile, loadFile, loadFromDir, padBetween, readJson, run, writeJson };
+export { BaseCommand, type CommandInput, c, cli, createMemoryStream, dd, execute, executeSync, guessExtension, loadBarrelFile, loadFile, loadFromDir, padBetween, readJson, run, writeJson };

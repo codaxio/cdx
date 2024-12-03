@@ -3827,16 +3827,25 @@ var BaseCommand = class {
     __publicField(this, "options", [
       ["-h, --help", "Show help"]
     ]);
+    __publicField(this, "configKey", "");
+    __publicField(this, "defaultConfig", {});
   }
   async register() {
     const command = this.program.command(this.name).description(this.description);
     this.options.forEach((option) => command.option(option[0], option[1], option[2]));
-    command.action(async (options, command2) => {
-      return await this.run(options, command2);
+    command.action(async (...inputs) => {
+      const config = this.mergeConfig(this.defaultConfig, this.configKey);
+      let command2 = inputs.pop();
+      return await this.run({
+        options: command2.opts(),
+        args: command2.args,
+        config,
+        command: command2
+      });
     });
     return command;
   }
-  async run(options, command) {
+  async run(inputs) {
     throw new Error("Method run not implemented.");
   }
   async execute(command, options = { cwd: process.cwd() }) {
@@ -3875,7 +3884,7 @@ var import_fs2 = __toESM(require("fs"), 1);
 var package_default = {
   name: "@codaxio/cdx",
   type: "module",
-  version: "0.27.0",
+  version: "0.28.0",
   publishToCodeArtifact: true,
   module: "src/index.ts",
   bin: {

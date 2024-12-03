@@ -4,12 +4,22 @@ import { execute, readJson,  writeJson } from "./utils";
 import { type ExecSyncOptions } from 'child_process';
 import type { Writable } from "stream";
 
+
+export type CommandInput = {
+  options: Record<string, any>,
+  args: string[],
+  command: any,
+  config: Record<string, any>
+}
 export class BaseCommand {
   name: string = "BaseCommand";
   description: string = "Command";
   options: [string, string, any?][] = [
     ['-h, --help', 'Show help'],
   ]
+
+  configKey: string = '';
+  defaultConfig: Record<string, any> = {};
 
   constructor(public program: Command, public config: Record<string, any>) {}
 
@@ -18,14 +28,21 @@ export class BaseCommand {
 
     this.options.forEach((option) => command.option(option[0], option[1], option[2]));
 
-    command.action(async (options, command) => {
-     return await this.run(options, command)
+    command.action(async (...inputs) => {
+      const config = this.mergeConfig(this.defaultConfig, this.configKey);
+      let command = inputs.pop();
+      return await this.run({
+        options: command.opts(),
+        args: command.args,
+        config,
+        command,
+      })
     });
 
     return command;
   }
 
-  async run(options: Record<string, any>, command: any) {
+  async run(inputs: CommandInput) {
     throw new Error("Method run not implemented.")
   }
 
