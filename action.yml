@@ -45,4 +45,4 @@ runs:
         pnpm i
         pwd
         ls -la
-        ./start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
+        bash ${{ github.action_path }}/start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
