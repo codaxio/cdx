@@ -19,7 +19,7 @@ inputs:
   git_user:
     description: 'Name of the user to use for git'
     required: true
-    default: 'RELEASEME'
+    default: 'RELEASEBOT'
   git_email:
     description: 'Email of the user to use for git'
     required: true
@@ -33,8 +33,8 @@ runs:
         version: 9
     - shell: bash
       run: |
-       git config --global user.email "${{ inputs.git_email }}"
        git config --global user.name "${{ inputs.git_user }}"
+       git config --global user.email "${{ inputs.git_email }}"
     - name: 'Install dependencies'
       shell: bash
       env:
