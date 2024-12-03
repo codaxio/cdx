@@ -1,0 +1,44 @@
+name: 'cdx'
+description: 'Dymanic CLI'
+author: Codaxio
+inputs:
+  token:
+    description: 'GitHub token for creating and grooming release PRs, defaults to using secrets.GITHUB_TOKEN'
+    required: false
+    default: ${{ github.token }}
+  config:
+    description: 'where can the config file be found in the project?'
+    required: true
+    default: '$HOME/cli.config.ts'
+  load:
+    description: 'Load commands from'
+    required: true
+  command:
+    description: 'which command should be run?'
+    required: true
+  git_user:
+    description: 'Name of the user to use for git'
+    required: true
+    default: 'RELEASEME'
+  git_email:
+    description: 'Email of the user to use for git'
+    required: true
+    default: 'bot@codaxio.com'
+
+runs:
+  using: 'composite'
+  steps: 
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - shell: bash
+      run: |
+       git config --global user.email "${{ inputs.git_email }}"
+       git config --global user.name "${{ inputs.git_user }}"
+    - name: 'Install dependencies'
+      shell: bash
+      env:
+        TERM: xterm-color
+        FORCE_COLOR: 3
+        CDX_INSTALL_ALL: true
+      run: pnpm i && ./start.sh --config ${{ inputs.config }} --load ${{ inputs.load }} -- ${{ inputs.command }}
