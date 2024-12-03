@@ -115,7 +115,7 @@ then
         exit 1
     fi
 fi
-pnpm install
+
 # Check if tsx is installed globally
 GLOBAL_DEPS=$(pnpm list -g --depth 0 --json)
 HAS_TSX=$(echo $GLOBAL_DEPS | jq '.[] | .dependencies | .tsx')
